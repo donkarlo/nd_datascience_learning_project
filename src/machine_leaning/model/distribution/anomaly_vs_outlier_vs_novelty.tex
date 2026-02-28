@@ -1,0 +1,32 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multirow}
+
+\title{anomaly\_vs\_outlier\_vs\_novelty}
+\date{}
+
+\begin{document}
+    \maketitle
+    \begin{itemize}
+        \item \textbf{Outlier:}
+        A data point that lies far from the majority of observations in feature space.
+        It is a purely statistical notion (distance, density, deviation).
+        An outlier is not necessarily an error; it may be rare but valid.
+        
+        \item \textbf{Anomaly:}
+        A behavior or state that violates the expected operating pattern of a system.
+        It has semantic or system-level meaning (fault, attack, malfunction).
+        An anomaly may appear as an outlier, but it can also be a structured pattern (e.g., temporal drift) rather than a single extreme point.
+        
+        \item \textbf{Novelty:}
+        A sample or regime coming from a distribution not seen during training.
+        Training data are assumed to contain only normal behavior.
+        Novelty is typically interpreted as distribution shift rather than local abnormality.
+    \end{itemize}
+    
+    % \bibliographystyle{plain}
+    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/refs/refs}
+\end{document}

@@ -1,0 +1,57 @@
+\chapter{Dimension reduction}
+\section{Manifold methods}
+    \subsection{t-SNE}
+    \subsection{UMAP}
+\section{Density based}
+    \subsection{DBSCAN}
+        \subsubsection{when to use?}
+\section{LDA}
+\section{PCA}
+\section{Autoencoders}
+\section{Independent Component Analysis (ICA)}
+\section{Sequential Non-negative Matrix Factorization (NMF)}
+\section{Generalized Discriminant Analysis (GDA)}
+\section{Missing Values Ratio (MVR): Threshold Setting}
+\section{Low Variance Filter}
+\section{High Correlation Filter}
+\section{Forward Feature Constructionr}
+\section{Backward Feature Elimination}
+
+
+\section{Checklist}
+        \subsection{Data Preprocessing Checklist}
+            
+            \paragraph{Handle Missing Values}
+                Address missing data through imputation or removal, as most algorithms such as PCA cannot handle null values.
+            
+            \paragraph{Scale the Data}
+                Standardize features (for example, using Z-score scaling) so that variables with larger numerical ranges do not dominate the results.
+            
+            \paragraph{Address High Correlation}
+                Apply a High Correlation Filter to remove redundant features that are strongly correlated with others.
+            
+            \paragraph{Filter Low Variance}
+                Remove features with near-zero variance using a Low Variance Filter.
+    
+    \subsection{Selection Checklist: Choose Your Approach}
+        
+        \paragraph{Feature Selection (Keep Original Features)}
+            This approach retains the original features while selecting the most relevant ones. Filter methods rely on statistical tests to rank features by relevance. Wrapper methods use iterative modeling strategies, such as Backward Elimination, to identify an optimal subset. Embedded methods rely on models with built-in selection mechanisms, such as Random Forest or LASSO.
+        
+        \paragraph{Feature Extraction (Create New Components)}
+            This approach transforms the data into a new feature space. For linear data, PCA is used to preserve maximum variance. For non-linear data, t-SNE is suitable for small clusters, while UMAP is preferred for larger datasets and preserving global structure. For supervised tasks, LDA (Linear Discriminant Analysis) is used to maximize class separability. For sparse data, such as text matrices, Truncated SVD is an appropriate choice.
+
+\subsection{Evaluation \& Validation Checklist}
+    
+    \paragraph{Preserved Variance}
+        In PCA-based approaches, examine the Explained Variance Ratio to ensure that the reduced dimensions retain sufficient information, typically around 90\% or more.
+    
+    \paragraph{Reproducibility}
+        Check whether the results remain stable across different subsets of the data.
+    
+    \paragraph{Visual Inspection}
+        Visualize the first two or three dimensions to verify meaningful clustering or separation.
+    
+    \paragraph{Performance Impact}
+        Compare model performance, such as accuracy and training speed, with and without dimensionality reduction.
+

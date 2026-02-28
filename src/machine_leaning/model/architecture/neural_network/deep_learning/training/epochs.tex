@@ -1,0 +1,19 @@
+how many times data is is fed forwarded through the neural network for training. Neighetr highr nor lowe is good, High values for epochs may cause overfitting and low values may cause underfitting so use early stopping to stop it and give a high number for epochs so that the system stops when necessary. such as this:
+\begin{minted}{python}
+    early_stopping = tf.keras.callbacks.EarlyStopping(
+            monitor="val_loss",
+            patience=10,
+            min_delta=0.0,
+            restore_best_weights=True,
+        )
+
+    self._tf_model.fit(
+        [enc, dec],
+        tgt,
+        epochs=self._config.get_epochs(),
+        batch_size=self._config.get_batch_size(),
+        shuffle=self._config.get_shuffle(),
+        validation_split=0.2,
+        callbacks=[early_stopping],
+    )
+\end{minted}

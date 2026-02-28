@@ -1,0 +1,37 @@
+Point-wise (Standard individual time steps)
+
+\todo{citation}
+
+This is from Google AI:
+\section*{Point-wise Transformers}
+    
+    Point-wise Transformers (often referred to as \textbf{Point Transformers}) are neural network architectures that adapt the standard Transformer self-attention mechanism to process 3D point cloud data.
+    
+    \subsection*{Key Concepts}
+        \begin{itemize}
+            \item \textbf{Permutation Invariance:} Unlike sequences in NLP, 3D point clouds are unordered sets. Point-wise Transformers are designed to be invariant to the order of points, ensuring the output is the same regardless of how the points are indexed.
+            \item \textbf{Vector Self-Attention:} Instead of the standard scalar dot-product attention used in language models, many Point Transformers use vector self-attention. This allows the model to modulate each feature channel individually, which is more effective for capturing the high-dimensional geometric features of 3D data.
+            \item \textbf{Local Neighborhood Processing:} Because global self-attention on large point clouds is computationally expensive (quadratic complexity), these models often perform attention within local neighborhoods defined by k-nearest neighbors (k-NN).
+        \end{itemize}
+    
+    \subsection*{Typical Architecture Blocks}
+        \begin{enumerate}
+            \item \textbf{Point Transformer Block:} The core unit that performs self-attention between points to learn local and global features.
+            \item \textbf{Transition Down Block:} Reduces the number of points (downsampling) while increasing feature dimensions, similar to pooling in CNNs.
+            \item \textbf{Transition Up Block:} Restores the point density for tasks requiring per-point predictions, such as semantic segmentation.
+            \item \textbf{Relative Position Encoding:} Uses the 3D coordinates ($x, y, z$) of points to encode spatial relationships, often by passing the relative offsets between points through a small MLP.
+        \end{enumerate}
+    
+    \subsection*{Primary Applications}
+        \begin{itemize}
+            \item \textbf{3D Object Classification:} Identifying what an object is from a raw point cloud.
+            \item \textbf{Semantic Segmentation:} Labeling every individual point in a 3D scene (e.g., distinguishing a "chair" point from a "floor" point).
+            \item \textbf{Part Segmentation:} Breaking down an object into its constituent parts (e.g., the legs, seat, and back of a chair).
+            \item \textbf{Point Cloud Registration:} Aligning two different 3D scans of the same object or environment.
+        \end{itemize}
+    
+    \subsection*{Related Terms}
+        \begin{itemize}
+            \item \textbf{Position-Wise Feed-Forward Network:} In standard Transformer models (like GPT), this refers to the sub-layer that processes each token independently after the attention step.
+            \item \textbf{Fast Point Transformer (FPT):} An optimized version that uses techniques like sparse voxelization to speed up processing for large-scale 3D scenes.
+        \end{itemize}
