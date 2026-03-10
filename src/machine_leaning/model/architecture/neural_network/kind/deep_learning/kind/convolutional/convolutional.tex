@@ -1,0 +1,45 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+
+\title{}
+\date{}
+
+\begin{document}
+    \maketitle
+    
+    
+    \section{Convolutional Neural Network (CNN)}
+        
+        A convolutional neural network differs in the following ways:
+        
+        \begin{itemize}
+            \item It uses local filters (kernels) instead of full connections.
+            \item Each neuron is connected only to a small local region of the input.
+            \item Spatial structure (e.g., image geometry) is preserved.
+            \item Parameters are shared across different spatial locations.
+            \item The total number of parameters is significantly smaller.
+        \end{itemize}
+        
+        A convolution layer computes:
+        \[
+            y(i,j) = \sum_{m}\sum_{n} K(m,n)\,x(i-m,j-n)
+        \]
+        where \( K \) is the convolution kernel.
+        
+        \subsection{Core Difference}
+            
+            The essential difference is:
+            
+            \begin{itemize}
+                \item Fully connected networks learn global patterns without spatial awareness.
+                \item Convolutional networks learn local patterns using weight sharing and local receptive fields.
+            \end{itemize}
+    
+    % \bibliographystyle{plain}
+    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/refs/refs}
+\end{document}

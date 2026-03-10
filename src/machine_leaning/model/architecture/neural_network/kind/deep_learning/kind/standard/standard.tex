@@ -1,0 +1,34 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+
+\title{}
+\date{}
+
+\begin{document}
+    \maketitle
+
+    
+    
+    A standard neural network (also called a fully connected or dense network) has the following properties:
+    
+    \begin{itemize}
+        \item Every neuron in a layer is connected to all neurons in the previous layer.
+        \item The input is treated as a flattened vector.
+        \item Spatial structure of the data is not preserved.
+        \item The number of parameters can be very large.
+    \end{itemize}
+    
+    Mathematically, a dense layer computes:
+    \[
+        y = Wx + b
+    \]
+    where \( W \) is a weight matrix, \( x \) is the input vector, and \( b \) is the bias vector.
+    
+    % \bibliographystyle{plain}
+    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/refs/refs}
+\end{document}
