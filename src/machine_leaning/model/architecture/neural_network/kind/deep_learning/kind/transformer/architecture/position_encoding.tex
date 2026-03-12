@@ -1,0 +1,71 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+
+\title{}
+\date{}
+
+\begin{document}
+    \maketitle
+    
+    Attention by itself does not know anything about the order of elements in the sequence. The attention operation treats the input as a set rather than an ordered sequence. Therefore the model needs an additional mechanism to represent the position of each element.
+    
+    This is the role of \textbf{positional encoding}.
+    
+    For each position \(i\), a positional vector \(p_i\) is created. This vector contains information about the index of the element within the sequence.
+    
+    The positional vector is added to the embedding:
+    
+    \[
+    z_i = e_i + p_i
+    \]
+    
+    The resulting vector \(z_i\) contains both
+    
+    \[
+    \text{content information} \quad (e_i)
+    \]
+    
+    and
+    
+    \[
+    \text{position information} \quad (p_i)
+    \]
+    
+    One common positional encoding uses sine and cosine functions:
+    
+    \[
+    p_{i,2k} = \sin\!\left(\frac{i}{10000^{2k/d}}\right)
+    \]
+    
+    \[
+    p_{i,2k+1} = \cos\!\left(\frac{i}{10000^{2k/d}}\right)
+    \]
+    
+    where \(d\) is the embedding dimension.
+    
+    After positional encoding is added, the vectors \(z_i\) are used to compute
+    
+    \[
+    Q = W_q z_i, \quad K = W_k z_i, \quad V = W_v z_i
+    \]
+    
+    and the attention mechanism operates on these representations.
+    
+    In summary, the roles are the following.
+    
+    Encoding converts raw input values into vectors suitable for neural computation.
+    
+    Positional encoding injects information about the order of elements in the sequence.
+    
+    Together they ensure that the Transformer can both interpret the content of each element and understand its position within the sequence.
+    
+    % \bibliographystyle{plain}
+    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/bibliography/bibliography.bib}
+\end{document}

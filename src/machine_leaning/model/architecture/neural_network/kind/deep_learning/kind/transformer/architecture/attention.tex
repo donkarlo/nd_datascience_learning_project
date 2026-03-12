@@ -1,0 +1,117 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+
+\title{}
+\date{}
+
+\begin{document}
+    \maketitle
+    The simplest Transformer performs sequence modeling through a mechanism called \textbf{attention}. Instead of processing elements strictly one after another, it allows every element in a sequence to directly consider all other elements.
+
+    Assume a sequence
+    
+    \[
+    x_1, x_2, x_3, x_4
+    \]
+    
+    Each \(x_i\) is a numerical vector (for example, sensor measurements at a specific time).
+    
+    For every element \(x_i\), the Transformer computes three vectors:
+    
+    \[
+    q_i = W_q x_i
+    \]
+    
+    \[
+    k_i = W_k x_i
+    \]
+    
+    \[
+    v_i = W_v x_i
+    \]
+    
+    These are called
+    
+    \[
+    \text{Query (Q)}, \quad \text{Key (K)}, \quad \text{Value (V)}
+    \]
+    
+    where \(W_q\), \(W_k\), and \(W_v\) are learned weight matrices.
+    
+    For example, for \(x_3\):
+    
+    \[
+    q_3 = W_q x_3
+    \]
+    
+    \[
+    k_3 = W_k x_3
+    \]
+    
+    \[
+    v_3 = W_v x_3
+    \]
+    
+    The model then determines how much \(x_3\) should attend to every element in the sequence. This is done by comparing \(q_3\) with all keys:
+    
+    \[
+    q_3 \cdot k_1,\quad q_3 \cdot k_2,\quad q_3 \cdot k_3,\quad q_3 \cdot k_4
+    \]
+    
+    These values are called \textbf{attention scores}.
+    
+    The scores are then normalized using the softmax function to produce weights. For example:
+    
+    \[
+    [0.1,\; 0.6,\; 0.2,\; 0.1]
+    \]
+    
+    This means that the third element \(x_3\) pays the most attention to \(x_2\).
+    
+    The output representation of \(x_3\) becomes a weighted combination of the value vectors:
+    
+    \[
+    0.1 v_1 + 0.6 v_2 + 0.2 v_3 + 0.1 v_4
+    \]
+    
+    Therefore, each position in the sequence aggregates information from all positions, weighted according to their relevance.
+    
+    In matrix form, the attention mechanism is written as
+    
+    \[
+    \text{Attention}(Q,K,V) =
+    \text{softmax}\!\left(\frac{QK^T}{\sqrt{d}}\right)V
+    \]
+    
+    where \(d\) is the dimensionality of the key vectors.
+    
+    Conceptually, the difference from an LSTM is the following.
+    
+    An LSTM processes a sequence sequentially:
+    
+    \[
+    x_1 \rightarrow x_2 \rightarrow x_3 \rightarrow x_4
+    \]
+    
+    Information must propagate through each intermediate step.
+    
+    A Transformer instead allows direct interactions between all elements:
+    
+    \[
+    x_1 \leftrightarrow x_2 \leftrightarrow x_3 \leftrightarrow x_4
+    \]
+    
+    The attention mechanism determines how strong each connection should be.
+    
+    For time series data this is particularly useful. If a pattern at time \(t=50\) resembles something that occurred at time \(t=3\), the Transformer can directly assign attention to that earlier position. In contrast, an LSTM must carry that relationship through many intermediate recurrent steps.
+
+    % \bibliographystyle{plain}
+    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/bibliography/bibliography.bib}
+\end{document}

@@ -1,0 +1,45 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{hyperref}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+
+\title{}
+\date{}
+
+\begin{document}
+    \maketitle
+    Before attention is applied, the input values must first be transformed into numerical vectors. This step is called \textbf{encoding}. The purpose of encoding is simply to convert raw inputs into vectors that the model can process mathematically.
+
+    For example, if the input is a time series
+    
+    \[
+    x_1, x_2, x_3, x_4
+    \]
+    
+    each element may originally be a scalar or a small feature vector. The encoder projects each element into a higher dimensional representation using a learned linear transformation:
+    
+    \[
+    e_i = W_e x_i
+    \]
+    
+    where \(W_e\) is a learned weight matrix. The resulting vector \(e_i\) is called the \textbf{embedding} of the input element.
+    
+    Thus the sequence becomes
+    
+    \[
+    e_1, e_2, e_3, e_4
+    \]
+    
+    These embeddings are then used to compute the Query, Key, and Value vectors used in attention.
+    
+    
+    
+    \section{}
+    % \bibliographystyle{plain}
+    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/bibliography/bibliography.bib}
+\end{document}
