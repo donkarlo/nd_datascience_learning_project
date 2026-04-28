@@ -1,0 +1,797 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{tikz}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Gaussian Transformer for Uncertainty-Aware Time-Series Forecasting}
+\date{}
+
+\begin{document}
+    \maketitle
+    
+    
+    \section{Introduction}
+        
+        Transformer-based models have been used for time-series forecasting because self-attention can model temporal dependencies over sequences. In deterministic forecasting, the model usually predicts only one future value for each output time step. However, in uncertainty-aware forecasting, the model predicts a probability distribution over future values.
+        
+        The model described here is a Gaussian Transformer for uncertainty-aware time-series forecasting. For each output time step and each output feature, it predicts two Gaussian parameters: the mean and the log-variance.
+        
+        The general forecasting problem is
+        
+        \[
+            f_{\theta}:
+            \mathbb{R}^{T_{\mathrm{in}} \times F_{\mathrm{in}}}
+            \rightarrow
+            \mathbb{R}^{T_{\mathrm{out}} \times 2F_{\mathrm{out}}},
+        \]
+        
+        where \(T_{\mathrm{in}}\) is the input horizon, \(T_{\mathrm{out}}\) is the output horizon, \(F_{\mathrm{in}}\) is the number of input features, and \(F_{\mathrm{out}}\) is the number of output features.
+        
+        The factor \(2F_{\mathrm{out}}\) appears because the model predicts two values for each output feature:
+        
+        \[
+            \mu
+            \quad
+            \text{and}
+            \quad
+            \log \sigma^2.
+        \]
+        
+        This formulation is related to probabilistic Transformer-based forecasting. For example, \cite{jawed-2022-gqformer-a-multi-quantile-generative-transformer-for-time-series-forecasting} proposed GQFormer, a Transformer-based probabilistic forecasting model that represents uncertainty through multiple forecast quantiles instead of producing only point predictions. In contrast, the present model represents uncertainty through a Gaussian predictive distribution.
+    
+    
+    \section{Input and Target Time-Series Windows}
+        
+        Let the original time series be
+        
+        \[
+            S
+            =
+            \left[
+                s_1,
+                s_2,
+                \ldots,
+            s_N
+            \right],
+        \]
+        
+        where
+        
+        \[
+            s_i
+            \in
+            \mathbb{R}^{F}.
+        \]
+        
+        For each window index \(k\), the input window is
+        
+        \[
+            X^{(k)}
+            =
+            \left[
+                x_k,
+                x_{k+1},
+                \ldots,
+            x_{k+T_{\mathrm{in}}-1}
+            \right],
+        \]
+        
+        where
+        
+        \[
+            x_t
+            \in
+            \mathbb{R}^{F_{\mathrm{in}}}.
+        \]
+        
+        The corresponding target window is
+        
+        \[
+            Y^{(k)}
+            =
+            \left[
+                y_{k+T_{\mathrm{in}}},
+            y_{k+T_{\mathrm{in}}+1},
+                \ldots,
+            y_{k+T_{\mathrm{in}}+T_{\mathrm{out}}-1}
+            \right],
+        \]
+        
+        where
+        
+        \[
+            y_t
+            \in
+            \mathbb{R}^{F_{\mathrm{out}}}.
+        \]
+        
+        For a batch of input windows, the input tensor has the shape
+        
+        \[
+            X
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{in}} \times F_{\mathrm{in}}},
+        \]
+        
+        where \(B\) is the batch size.
+        
+        The target tensor has the shape
+        
+        \[
+            Y
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times F_{\mathrm{out}}}.
+        \]
+    
+    
+    \section{Input Projection and Positional Embedding}
+        
+        The input sequence is first projected into the Transformer model dimension. Let \(d_{\mathrm{model}}\) denote the latent model dimension. The input projection is
+        
+        \[
+            H_0
+            =
+            XW_{\mathrm{in}}
+            +
+            b_{\mathrm{in}},
+        \]
+        
+        where
+        
+        \[
+            H_0
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{in}} \times d_{\mathrm{model}}}.
+        \]
+        
+        Since the Transformer has no recurrent structure, positional information is added to the projected sequence. A learnable positional embedding \(P\) is added as
+        
+        \[
+            H
+            =
+            H_0
+            +
+            P.
+        \]
+        
+        Here,
+        
+        \[
+            P
+            \in
+            \mathbb{R}^{T_{\mathrm{in}} \times d_{\mathrm{model}}}.
+        \]
+        
+        This allows the model to distinguish between different temporal positions in the input window.
+    
+    
+    \section{Self-Attention Layer}
+        
+        The Transformer uses self-attention to model temporal dependencies between different time steps. From the hidden representation \(H\), the query, key, and value matrices are computed as
+        
+        \[
+            Q
+            =
+            HW_Q,
+        \]
+        
+        \[
+            K
+            =
+            HW_K,
+        \]
+        
+        \[
+            V
+            =
+            HW_V.
+        \]
+        
+        For one attention head, the scaled dot-product attention is
+        
+        \[
+            \mathrm{Attention}
+            \left(
+                Q,
+                K,
+                V
+            \right)
+            =
+            \mathrm{softmax}
+            \left(
+                \frac{
+                    QK^{\top}
+                }{
+                    \sqrt{d_k}
+                }
+            \right)
+            V,
+        \]
+        
+        where \(d_k\) is the key dimension. If \(h\) is the number of attention heads, then
+        
+        \[
+            d_k
+            =
+            \frac{
+                d_{\mathrm{model}}
+            }{
+                h
+            }.
+        \]
+        
+        Multi-head attention applies this operation over several heads:
+        
+        \[
+            \mathrm{MHA}(H)
+            =
+            \mathrm{Concat}
+            \left(
+                \mathrm{head}_1,
+                \mathrm{head}_2,
+                \ldots,
+                \mathrm{head}_h
+            \right)
+            W_O.
+        \]
+        
+        The output of the attention layer is added to the input representation through a residual connection and then normalized:
+        
+        \[
+            H_{\mathrm{attn}}
+            =
+            \mathrm{LayerNorm}
+            \left(
+                H
+                +
+                \mathrm{Dropout}
+                \left(
+                    \mathrm{MHA}(H)
+                \right)
+            \right).
+        \]
+    
+    
+    \section{Feed-Forward Layer}
+        
+        After self-attention, the model applies a position-wise feed-forward network. This network is applied independently to each time step:
+        
+        \[
+            \mathrm{FFN}
+            \left(
+                H_{\mathrm{attn}}
+            \right)
+            =
+            \phi
+            \left(
+                H_{\mathrm{attn}}W_1
+            +
+            b_1
+            \right)
+            W_2
+            +
+            b_2,
+        \]
+        
+        where \(\phi\) is the ReLU activation function.
+        
+        The feed-forward output is again added through a residual connection and normalized:
+        
+        \[
+            H_{\mathrm{enc}}
+            =
+            \mathrm{LayerNorm}
+            \left(
+                H_{\mathrm{attn}}
+                +
+                \mathrm{Dropout}
+                \left(
+                    \mathrm{FFN}
+                    \left(
+                        H_{\mathrm{attn}}
+                    \right)
+                \right)
+            \right).
+        \]
+        
+        The tensor \(H_{\mathrm{enc}}\) is the encoded representation of the input time-series window.
+    
+    
+    \section{Mapping from Input Horizon to Output Horizon}
+        
+        In a general time-series forecasting formulation, the input horizon and the output horizon do not need to be equal. Therefore, after encoding the input sequence, the model should produce an output sequence of length \(T_{\mathrm{out}}\).
+        
+        Conceptually, this can be written as
+        
+        \[
+            Z
+            =
+            g_{\theta}
+            \left(
+                H_{\mathrm{enc}}
+            \right),
+        \]
+        
+        where
+        
+        \[
+            Z
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times d_{\mathrm{model}}}.
+        \]
+        
+        The function \(g_{\theta}\) represents the part of the model that maps the encoded input horizon to the prediction horizon. This mapping can be implemented in different ways, for example by using a decoder, learned output queries, temporal pooling followed by projection, or another sequence-mapping layer.
+        
+        The important point is that the general forecasting model should learn the mapping
+        
+        \[
+            \mathbb{R}^{B \times T_{\mathrm{in}} \times F_{\mathrm{in}}}
+            \rightarrow
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times 2F_{\mathrm{out}}},
+        \]
+        
+        not necessarily
+        
+        \[
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times F_{\mathrm{in}}}
+            \rightarrow
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times 2F_{\mathrm{out}}}.
+        \]
+    
+    
+    \section{Gaussian Output Layer}
+        
+        The probabilistic output layer predicts two tensors. The first tensor is the mean:
+        
+        \[
+            \mu
+            =
+            f_{\mu}
+            \left(
+                Z
+            \right),
+        \]
+        
+        and the second tensor is the log-variance:
+        
+        \[
+            \log \sigma^2
+            =
+            f_{\log \sigma^2}
+            \left(
+                Z
+            \right).
+        \]
+        
+        Both tensors have the shape
+        
+        \[
+            \mu,
+            \log \sigma^2
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times F_{\mathrm{out}}}.
+        \]
+        
+        The final output of the model is the concatenation of these two tensors:
+        
+        \[
+            \hat{Y}_{\mathrm{params}}
+            =
+            \left[
+                \mu,
+                \log \sigma^2
+            \right].
+        \]
+        
+        Therefore,
+        
+        \[
+            \hat{Y}_{\mathrm{params}}
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times 2F_{\mathrm{out}}}.
+        \]
+        
+        The predicted variance is recovered from the predicted log-variance as
+        
+        \[
+            \sigma^2
+            =
+            \exp
+            \left(
+                \log \sigma^2
+            \right).
+        \]
+        
+        This transformation guarantees that the variance remains positive.
+    
+    
+    \section{Probabilistic Interpretation}
+        
+        For each batch item \(b\), output time step \(t\), and output feature \(j\), the model assumes that the target value follows a Gaussian distribution:
+        
+        \[
+            y_{b,t,j}
+            \sim
+            \mathcal{N}
+            \left(
+                \mu_{b,t,j},
+                \sigma^2_{b,t,j}
+            \right).
+        \]
+        
+        Equivalently, the conditional predictive distribution is
+        
+        \[
+            p
+            \left(
+                y_{b,t,j}
+                \mid
+                X_b
+            \right)
+            =
+            \mathcal{N}
+            \left(
+                y_{b,t,j};
+                \mu_{b,t,j},
+                \sigma^2_{b,t,j}
+            \right).
+        \]
+        
+        The mean \(\mu_{b,t,j}\) represents the expected future value:
+        
+        \[
+            \mu_{b,t,j}
+            \approx
+            \mathbb{E}
+            \left[
+                y_{b,t,j}
+                \mid
+                X_b
+            \right],
+        \]
+        
+        while the variance \(\sigma^2_{b,t,j}\) represents predictive uncertainty:
+        
+        \[
+            \sigma^2_{b,t,j}
+            \approx
+            \mathrm{Var}
+            \left(
+                y_{b,t,j}
+                \mid
+                X_b
+            \right).
+        \]
+        
+        A small variance indicates that the model is relatively confident about its prediction. A large variance indicates higher predictive uncertainty.
+    
+    
+    \section{Gaussian Negative Log-Likelihood Loss}
+        
+        The model is trained using the Gaussian negative log-likelihood. For a scalar target value \(y\), the Gaussian likelihood is
+        
+        \[
+            p
+            \left(
+                y
+                \mid
+                \mu,
+                \sigma^2
+            \right)
+            =
+            \frac{
+                1
+            }{
+                \sqrt{
+                    2\pi\sigma^2
+                }
+            }
+            \exp
+            \left(
+                -
+                \frac{
+                    \left(
+                        y
+                        -
+                        \mu
+                    \right)^2
+                }{
+                    2\sigma^2
+                }
+            \right).
+        \]
+        
+        The negative log-likelihood is
+        
+        \[
+            -
+            \log
+            p
+            \left(
+                y
+                \mid
+                \mu,
+                \sigma^2
+            \right)
+            =
+            \frac{1}{2}
+            \log
+            \left(
+                2\pi\sigma^2
+            \right)
+            +
+            \frac{
+                \left(
+                    y
+                    -
+                    \mu
+                \right)^2
+            }{
+                2\sigma^2
+            }.
+        \]
+        
+        The constant term \(\frac{1}{2}\log(2\pi)\) does not affect optimization. Therefore, the implemented loss uses the simplified form
+        
+        \[
+            \mathcal{L}_{b,t,j}
+            =
+            \frac{1}{2}
+            \left[
+                \log \sigma^2_{b,t,j}
+                +
+                \frac{
+                    \left(
+                        y_{b,t,j}
+                        -
+                        \mu_{b,t,j}
+                    \right)^2
+                }{
+                    \sigma^2_{b,t,j}
+                }
+            \right].
+        \]
+        
+        Since the model predicts \(\log \sigma^2\), the inverse variance can be written as
+        
+        \[
+            \frac{1}{\sigma^2_{b,t,j}}
+            =
+            \exp
+            \left(
+                -
+                \log \sigma^2_{b,t,j}
+            \right).
+        \]
+        
+        Therefore, the implemented loss is
+        
+        \[
+            \mathcal{L}_{b,t,j}
+            =
+            \frac{1}{2}
+            \left[
+                \log \sigma^2_{b,t,j}
+                +
+                \left(
+                    y_{b,t,j}
+                    -
+                    \mu_{b,t,j}
+                \right)^2
+                \exp
+                \left(
+                    -
+                    \log \sigma^2_{b,t,j}
+                \right)
+            \right].
+        \]
+        
+        For one output time step, the loss is summed over all output features:
+        
+        \[
+            \mathcal{L}_{b,t}
+            =
+            \sum_{j=1}^{F_{\mathrm{out}}}
+            \mathcal{L}_{b,t,j}.
+        \]
+        
+        The final loss is the mean over all batch items and output time steps:
+        
+        \[
+            \mathcal{L}
+            =
+            \frac{1}{BT_{\mathrm{out}}}
+            \sum_{b=1}^{B}
+            \sum_{t=1}^{T_{\mathrm{out}}}
+            \sum_{j=1}^{F_{\mathrm{out}}}
+            \frac{1}{2}
+            \left[
+                \log \sigma^2_{b,t,j}
+                +
+                \left(
+                    y_{b,t,j}
+                    -
+                    \mu_{b,t,j}
+                \right)^2
+                \exp
+                \left(
+                    -
+                    \log \sigma^2_{b,t,j}
+                \right)
+            \right].
+        \]
+    
+    
+    \section{Sliding Window Training Pairs}
+        
+        The training data are generated from the original time series using a sliding window. For each window index \(k\), the input sequence is
+        
+        \[
+            X^{(k)}
+            =
+            \left[
+                s_k,
+                s_{k+1},
+                \ldots,
+            s_{k+T_{\mathrm{in}}-1}
+            \right].
+        \]
+        
+        The corresponding target sequence is
+        
+        \[
+            Y^{(k)}
+            =
+            \left[
+                s_{k+T_{\mathrm{in}}},
+            s_{k+T_{\mathrm{in}}+1},
+                \ldots,
+            s_{k+T_{\mathrm{in}}+T_{\mathrm{out}}-1}
+            \right].
+        \]
+        
+        If an overlap value \(O\) is used between consecutive input-target pairs, the next window starts before the previous window has fully moved away. This increases the number of training examples and allows neighboring temporal patterns to be represented in the training set.
+        
+        The training dataset can be written as
+        
+        \[
+            \mathcal{D}
+            =
+            \left\{
+                \left(
+                    X^{(k)},
+                Y^{(k)}
+                \right)
+            \right\}_{k=1}^{M}.
+        \]
+    
+    
+    \section{Meaning of Uncertainty}
+        
+        The predicted mean gives the expected future value:
+        
+        \[
+            \mu_{b,t,j}
+            \approx
+            \mathbb{E}
+            \left[
+                y_{b,t,j}
+                \mid
+                X_b
+            \right].
+        \]
+        
+        The predicted variance gives the predictive uncertainty:
+        
+        \[
+            \sigma^2_{b,t,j}
+            \approx
+            \mathrm{Var}
+            \left(
+                y_{b,t,j}
+                \mid
+                X_b
+            \right).
+        \]
+        
+        The standard deviation is
+        
+        \[
+            \sigma_{b,t,j}
+            =
+            \sqrt{
+                \sigma^2_{b,t,j}
+            }.
+        \]
+        
+        Assuming a Gaussian predictive distribution, an approximate 95 percent prediction interval is
+        
+        \[
+            y_{b,t,j}
+            \in
+            \left[
+                \mu_{b,t,j}
+                -
+                1.96\sigma_{b,t,j},
+                \mu_{b,t,j}
+                +
+                1.96\sigma_{b,t,j}
+            \right].
+        \]
+        
+        This interval gives an interpretable range around the predicted mean. Wider intervals indicate larger predictive uncertainty.
+    
+    
+    \section{Simplification in the Current Implementation}
+        
+        The general formulation distinguishes between the input horizon \(T_{\mathrm{in}}\) and the output horizon \(T_{\mathrm{out}}\). However, the current implementation uses the output sequence size as the input sequence length in the TensorFlow input layer.
+        
+        Therefore, the current implementation implicitly uses
+        
+        \[
+            X
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times F_{\mathrm{in}}},
+        \]
+        
+        and assumes
+        
+        \[
+            T_{\mathrm{in}}
+            =
+            T_{\mathrm{out}}.
+        \]
+        
+        This equality is not a theoretical requirement of the Gaussian Transformer. It is only a simplifying assumption in the current implementation.
+        
+        A more general implementation should define the input tensor as
+        
+        \[
+            X
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{in}} \times F_{\mathrm{in}}},
+        \]
+        
+        and the output tensor as
+        
+        \[
+            \hat{Y}_{\mathrm{params}}
+            \in
+            \mathbb{R}^{B \times T_{\mathrm{out}} \times 2F_{\mathrm{out}}}.
+        \]
+    
+    
+    \section{Summary}
+        
+        The model is an uncertainty-aware Transformer for time-series forecasting. It receives an input time-series window and predicts a future output window. For each future time step and each output feature, it predicts a Gaussian mean and a Gaussian variance.
+        
+        The predicted mean represents the expected future value, while the predicted variance represents predictive uncertainty. The model is trained using the Gaussian negative log-likelihood, which encourages the model to predict accurate means and meaningful uncertainty estimates.
+        
+        The current implementation simplifies the general formulation by assuming equal input and output horizons. However, the general mathematical formulation should keep \(T_{\mathrm{in}}\) and \(T_{\mathrm{out}}\) separate.
+        
+        \bibliographystyle{plainnat}
+        \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
