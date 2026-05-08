@@ -1,0 +1,113 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Root mean squared error}
+\date{}
+
+\begin{document}
+    \maketitle
+    Root Mean Squared Error, abbreviated as RMSE, is a measure of the average magnitude of prediction error. It is commonly used to evaluate how far predicted values are from true values.
+    
+    Assume that the true values are
+    
+    \[
+        y_1, y_2, \ldots, y_n
+    \]
+    
+    and the fitted or predicted values are
+    
+    \[
+        \hat{y}_1, \hat{y}_2, \ldots, \hat{y}_n
+    \]
+    
+    The error at each point is
+    
+    \[
+        e_i = y_i - \hat{y}_i
+    \]
+    
+    The RMSE is defined as
+    
+    \[
+        \mathrm{RMSE}
+        =
+        \sqrt{
+            \frac{1}{n}
+            \sum_{i=1}^{n}
+            (
+            y_i - \hat{y}_i
+            )^2
+        }
+    \]
+    
+    RMSE first squares each error, then computes the mean of the squared errors, and finally takes the square root. Because the errors are squared, RMSE gives more weight to large errors than Mean Absolute Error.
+    
+    For example, suppose the true values are
+    
+    \[
+        y = [10, 12, 15]
+    \]
+    
+    and the predicted values are
+    
+    \[
+        \hat{y} = [9, 14, 14]
+    \]
+    
+    The errors are
+    
+    \[
+        e = y - \hat{y} = [1, -2, 1]
+    \]
+    
+    Therefore,
+    
+    \[
+        \mathrm{RMSE}
+        =
+        \sqrt{
+            \frac{
+                1^2 + (-2)^2 + 1^2
+            }{3}
+        }
+    \]
+    
+    \[
+        \mathrm{RMSE}
+        =
+        \sqrt{
+            \frac{6}{3}
+        }
+        =
+        \sqrt{2}
+        \approx 1.414
+    \]
+    
+    In this example, the RMSE is approximately \(1.414\). This means that the predicted values differ from the true values by about \(1.414\) units on average, with larger errors having stronger influence on the final value.
+%    \bibliographystyle{plainnat}
+%    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
