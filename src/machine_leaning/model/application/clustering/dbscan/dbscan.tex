@@ -1,0 +1,187 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{DBSCAN}
+\date{}
+
+\begin{document}
+\maketitle
+
+\subsection{DBSCAN}
+    
+    Let the dataset be
+    
+    \[
+        X = \{x_1, x_2, \dots, x_n\},
+    \]
+    
+    where each object \(x_i\) belongs to a metric space with distance function
+    
+    \[
+        d : X \times X \rightarrow \mathbb{R}_{\geq 0}.
+    \]
+    
+    DBSCAN uses two parameters:
+    
+    \[
+        \varepsilon > 0
+    \]
+    
+    and
+    
+    \[
+        \mathrm{MinPts} \in \mathbb{N}.
+    \]
+    
+    The \(\varepsilon\)-neighborhood of a point \(x_i\) is defined as
+    
+    \[
+        N_{\varepsilon}(x_i)
+        =
+        \{x_j \in X \mid d(x_i, x_j) \leq \varepsilon\}.
+    \]
+    
+    A point \(x_i\) is called a core point if
+    
+    \[
+        |N_{\varepsilon}(x_i)| \geq \mathrm{MinPts}.
+    \]
+    
+    A point \(x_j\) is directly density-reachable from \(x_i\) if
+    
+    \[
+        x_j \in N_{\varepsilon}(x_i)
+    \]
+    
+    and
+    
+    \[
+        |N_{\varepsilon}(x_i)| \geq \mathrm{MinPts}.
+    \]
+    
+    A point \(x_j\) is density-reachable from \(x_i\) if there exists a sequence of points
+    
+    \[
+        x_i = p_1, p_2, \dots, p_m = x_j
+    \]
+    
+    such that
+    
+    \[
+        p_{k+1}
+    \]
+    
+    is directly density-reachable from
+    
+    \[
+        p_k
+    \]
+    
+    for every
+    
+    \[
+        k = 1, 2, \dots, m-1.
+    \]
+    
+    Two points \(x_i\) and \(x_j\) are density-connected if there exists a point \(o \in X\) such that both \(x_i\) and \(x_j\) are density-reachable from \(o\).
+    
+    A cluster \(C \subseteq X\) in DBSCAN satisfies two conditions.
+    
+    First, maximality:
+    
+    \[
+        x_i \in C
+        \land
+        x_j \text{ is density-reachable from } x_i
+        \Rightarrow
+        x_j \in C.
+    \]
+    
+    Second, density connectivity:
+    
+    \[
+        \forall x_i, x_j \in C,
+        \quad
+        x_i \text{ and } x_j \text{ are density-connected}.
+    \]
+    
+    All points that do not belong to any cluster are labeled as noise:
+    
+    \[
+        \mathrm{Noise}
+        =
+        X \setminus \bigcup_{k=1}^{K} C_k.
+    \]
+    
+    \begin{algorithm}
+        \caption{DBSCAN}
+        \begin{algorithmic}[1]
+            \Require Dataset \(X\), distance function \(d\), radius \(\varepsilon\), minimum number of points \(\mathrm{MinPts}\)
+            \Ensure Clusters \(C_1, C_2, \dots, C_K\) and noise points
+            
+            \State Mark all points as unvisited
+            \State \(K \gets 0\)
+            
+            \ForAll{\(x_i \in X\)}
+                \If{\(x_i\) is visited}
+                    \State Continue
+                \EndIf
+                
+                \State Mark \(x_i\) as visited
+                \State \(N \gets N_{\varepsilon}(x_i)\)
+                
+                \If{\(|N| < \mathrm{MinPts}\)}
+                    \State Mark \(x_i\) as noise
+                \Else
+                    \State \(K \gets K + 1\)
+                    \State Create a new cluster \(C_K\)
+                    \State Add \(x_i\) to \(C_K\)
+                    
+                    \ForAll{\(x_j \in N\)}
+                        \If{\(x_j\) is not visited}
+                            \State Mark \(x_j\) as visited
+                            \State \(N_j \gets N_{\varepsilon}(x_j)\)
+                            
+                            \If{\(|N_j| \geq \mathrm{MinPts}\)}
+                                \State \(N \gets N \cup N_j\)
+                            \EndIf
+                        \EndIf
+                        
+                        \If{\(x_j\) is not assigned to any cluster}
+                            \State Add \(x_j\) to \(C_K\)
+                        \EndIf
+                    \EndFor
+                \EndIf
+            \EndFor
+        \end{algorithmic}
+    \end{algorithm}
+    \nocite{*}
+    \bibliographystyle{plainnat}
+    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
