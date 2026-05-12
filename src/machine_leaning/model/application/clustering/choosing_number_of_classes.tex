@@ -1,0 +1,104 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Choosing number of classes}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+    \maketitle
+    
+    
+    \section{Silhouette score}
+        The silhouette score \cite{rousseeuw-1987-silhouettes-a-graphical-aid-to-the-interpretation-and-validation-of-cluster-analysis} measures how well each sample belongs to its assigned cluster in comparison with the nearest alternative cluster. For a sample \(i\), let \(a_i\) denote the mean distance between \(i\) and the other samples in its own cluster, and let \(b_i\) denote the smallest mean distance between \(i\) and samples in another cluster. The silhouette value is defined as
+        
+        \[
+            s_i
+            =
+            \frac{b_i - a_i}{\max(a_i, b_i)}.
+        \]
+        
+        For a clustering solution with \(k\) clusters, the average silhouette score is
+        
+        \[
+            S(k)
+            =
+            \frac{1}{n}
+            \sum_{i=1}^{n}
+            s_i.
+        \]
+        
+        Since the ordinary silhouette criterion may favor a larger number of clusters when the improvement is small, a penalty term can be added to discourage unnecessary cluster splitting:
+        
+        \[
+            S_{\mathrm{pen}}(k)
+            =
+            S(k)
+            -
+            \lambda
+            \frac{k - 1}{k_{\max} - 1},
+        \]
+        
+        where \(\lambda\) controls the strength of the penalty, and \(k_{\max}\) is the maximum tested number of clusters. The final number of clusters is selected as
+        
+        \[
+            k^{\ast}
+            =
+            \arg\max_{k}
+            S_{\mathrm{pen}}(k).
+        \]
+        
+        In this analysis, the penalized silhouette criterion selected
+        
+        \[
+            k^{\ast} = 5.
+        \]
+        
+        \subsection{penalized average silhouette width (ASW)}
+            \cite{deng-2024-on-estimation-and-order-selection-for-multivariate-extremes-via-clustering} propose a penalized average silhouette width (ASW) criterion for selecting the number of clusters in multivariate extreme-value analysis.
+            The penalty is designed to reduce spurious cluster selection caused by tiny isolated clusters or by splitting one true center into several nearby centers.
+            The method selects the cluster order by inspecting penalized ASW curves over small penalty values, rather than by relying only on the ordinary silhouette maximum.
+            \begin{algorithm}[H]
+            \caption{Penalized ASW Order Selection}
+            \begin{algorithmic}[1]
+                \State Choose candidate orders \(k \in \{1,\dots,k_{\max}\}\) and small penalty values \(t \in T\).
+                \For{each \(k\)}
+                    \State Cluster the sample \(W\) and obtain centers \(A_k^\ast=\{a_1^\ast,\dots,a_k^\ast\}\) and clusters \(C_1,\dots,C_k\).
+                    \State For each \(w \in W\), compute \(a(w)=D(w,A_k^\ast)\) and \(b(w)=D(w,A_k^\ast \setminus \{a_i^\ast\})\).
+                    \State Compute \(\bar{s}(k)=1-\frac{1}{|W|}\sum_{w\in W}\frac{a(w)}{b(w)}\).
+                    \State Compute the penalty factor \(p_t(k)=\left(\min_i \frac{|C_i|}{|W|/k}\right)^t\left(\min_{i<j}D(a_i^\ast,a_j^\ast)\right)^t\).
+                    \State Compute \(S_t(k)=p_t(k)-\frac{1}{|W|}\sum_{w\in W}\frac{a(w)}{b(w)}\).
+                \EndFor
+                \State Select \(k^\ast\) from the maximum or turning point of \(S_t(k)\) over small \(t\) values.
+            \end{algorithmic}
+            \end{algorithm}
+            
+            \bibliographystyle{plainnat}
+            \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
