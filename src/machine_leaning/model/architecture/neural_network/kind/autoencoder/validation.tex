@@ -1,0 +1,250 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{tikz}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Validating autoencoder performance}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+    \maketitle
+    
+    
+    \section{Validation of Autoencoder Performance}
+        
+        An autoencoder is usually validated by measuring how well it reconstructs unseen data.
+        Let the validation dataset be
+        
+        \[
+            X_{\mathrm{val}}=\{x_1,x_2,\dots,x_N\},
+            \qquad
+            x_i \in \mathbb{R}^{d}.
+        \]
+        
+        For each input sample \(x_i\), the encoder maps the input into a latent representation,
+        
+        \[
+            z_i=f_{\phi}(x_i),
+        \]
+        
+        and the decoder reconstructs the input as
+        
+        \[
+            \hat{x}_i=g_{\theta}(z_i)=g_{\theta}(f_{\phi}(x_i)).
+        \]
+        
+        The main validation criterion is the reconstruction error on unseen validation data:
+        
+        \[
+            \mathcal{L}_{\mathrm{val}}
+            =
+            \frac{1}{Nd}
+            \sum_{i=1}^{N}
+            \sum_{j=1}^{d}
+            (x_{ij}-\hat{x}_{ij})^2.
+        \]
+        
+        A lower validation reconstruction error indicates that the autoencoder reconstructs unseen samples more accurately.
+        However, the training error must also be compared with the validation error:
+        
+        \[
+            \Delta_{\mathrm{generalization}}
+            =
+            \mathcal{L}_{\mathrm{val}}
+            -
+            \mathcal{L}_{\mathrm{train}}.
+        \]
+        
+        If this gap is small, the autoencoder is likely generalizing well.
+        If the training error is low but the validation error is high, the model is probably overfitting.
+    
+    
+    \section{Common Reconstruction Metrics}
+        
+        Several metrics can be used to evaluate the reconstruction quality.
+        
+        Mean squared error is defined as
+        
+        \[
+            \mathrm{MSE}
+            =
+            \frac{1}{Nd}
+            \sum_{i=1}^{N}
+            \sum_{j=1}^{d}
+            (x_{ij}-\hat{x}_{ij})^2.
+        \]
+        
+        Mean absolute error is defined as
+        
+        \[
+            \mathrm{MAE}
+            =
+            \frac{1}{Nd}
+            \sum_{i=1}^{N}
+            \sum_{j=1}^{d}
+            \left|x_{ij}-\hat{x}_{ij}\right|.
+        \]
+        
+        For multidimensional sensory data, the reconstruction error of each sample can be computed as
+        
+        \[
+            e_i
+            =
+            \frac{1}{d}
+            \sum_{j=1}^{d}
+            (x_{ij}-\hat{x}_{ij})^2,
+        \]
+        
+        where \(d\) is the number of input dimensions.
+    
+    
+    \section{Validation for Novelty or Anomaly Detection}
+        
+        When an autoencoder is used for novelty detection, it is usually trained only on normal data.
+        The assumption is that normal samples are reconstructed well, while novel or abnormal samples produce larger reconstruction errors.
+        
+        The reconstruction error for a validation sample is
+        
+        \[
+            e_i
+            =
+            \frac{1}{d}
+            \sum_{j=1}^{d}
+            (x_{ij}-\hat{x}_{ij})^2.
+        \]
+        
+        A threshold \(\tau\) can be selected from the reconstruction errors of normal validation data.
+        For example, using the \(q\)-quantile:
+        
+        \[
+            \tau
+            =
+            Q_q
+            (
+            \{e_1,e_2,\dots,e_N\}
+            ).
+        \]
+        
+        A new sample \(x_i\) is then classified as novel if
+        
+        \[
+            e_i > \tau.
+        \]
+        
+        Otherwise, it is classified as normal:
+        
+        \[
+            e_i \leq \tau.
+        \]
+        
+        If labeled normal and abnormal validation data are available, the threshold can be evaluated using precision, recall, \(F_1\)-score, ROC-AUC, or PR-AUC.
+    
+    
+    \section{Validation of the Latent Space}
+        
+        Reconstruction error alone is not always sufficient.
+        The latent space should also be inspected.
+        A useful autoencoder should map similar inputs to nearby latent representations.
+        
+        For two input samples \(x_i\) and \(x_j\), their latent vectors are
+        
+        \[
+            z_i=f_{\phi}(x_i),
+            \qquad
+            z_j=f_{\phi}(x_j).
+        \]
+        
+        The latent distance can be computed as
+        
+        \[
+            d_z(i,j)
+            =
+            \|z_i-z_j\|_2.
+        \]
+        
+        If similar input samples have small latent distances and different input samples have larger latent distances, the latent representation is more meaningful.
+    
+    
+    \section{Final Test Evaluation}
+        
+        The validation set is used for model selection and threshold selection.
+        The test set must be kept independent and used only once for the final evaluation.
+        
+        The final test loss is
+        
+        \[
+            \mathcal{L}_{\mathrm{test}}
+            =
+            \frac{1}{N_{\mathrm{test}}d}
+            \sum_{i=1}^{N_{\mathrm{test}}}
+            \sum_{j=1}^{d}
+            (x_{ij}^{\mathrm{test}}-\hat{x}_{ij}^{\mathrm{test}})^2.
+        \]
+        
+        The autoencoder is considered reliable if the validation loss and test loss are close:
+        
+        \[
+            \mathcal{L}_{\mathrm{test}}
+            \approx
+            \mathcal{L}_{\mathrm{val}}.
+        \]
+        
+        A large difference between test loss and validation loss indicates that the validation procedure may not represent the true generalization behavior of the model.
+    
+    
+    \section{Practical Validation Procedure}
+        
+        The practical validation of an autoencoder can be summarized as follows:
+        
+        \begin{enumerate}
+            \item Split the data into training, validation, and test sets.
+            \item Train the autoencoder only on the training set.
+            \item Compute reconstruction error on the validation set.
+            \item Compare training and validation losses to check overfitting.
+            \item Inspect reconstructed samples visually or numerically.
+            \item Analyze the latent space using clustering or dimensionality reduction.
+            \item If the autoencoder is used for novelty detection, choose a threshold on validation errors.
+            \item Evaluate the final performance on the independent test set.
+        \end{enumerate}
+    
+    
+    \section{Interpretation}
+        
+        An autoencoder is considered to perform well if it satisfies the following conditions:
+        
+        \begin{enumerate}
+            \item The validation reconstruction error is low.
+            \item The gap between training and validation error is small.
+            \item The reconstructed signals preserve the important structure of the original signals.
+            \item The latent space separates meaningful patterns.
+            \item For novelty detection, abnormal samples produce higher reconstruction errors than normal samples.
+            \item The final test loss is close to the validation loss.
+        \end{enumerate}
+
+%	\bibliographystyle{plainnat}
+%	\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

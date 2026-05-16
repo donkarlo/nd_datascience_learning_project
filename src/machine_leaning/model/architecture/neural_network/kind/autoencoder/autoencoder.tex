@@ -1,0 +1,39 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Autoencoder}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+    \maketitle
+    \cite{hinton-2006-reducing-the-dimensionality-of-data-with-neural-networks} proposed a deep autoencoder for nonlinear dimensionality reduction.
+    The method first pretrains stacked restricted Boltzmann machines layer by layer, then unrolls them into an encoder--decoder network and fine-tunes the whole model with backpropagation.
+    Their experiments showed that deep autoencoders can produce lower-dimensional codes with better reconstruction and visualization quality than PCA.
+    \bibliographystyle{plainnat}
+    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

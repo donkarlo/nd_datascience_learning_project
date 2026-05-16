@@ -1,0 +1,49 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/parts/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_ai_project/src/nd_ai/knoweldge_representation/language/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Variational autoencoders}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+    \maketitle
+    \cite{kingma-2013-auto-encoding-variational-bayes} introduced the variational autoencoder, where an encoder approximates the intractable posterior as \(q_{\phi}(z \mid x)\), while a decoder models data generation as \(p_{\theta}(x \mid z)\).
+    The model maximizes the variational lower bound
+    \[
+        \log p_{\theta}(x) \geq \mathcal{L}(\theta,\phi;x)
+        = -D_{\mathrm{KL}}\!\left(q_{\phi}(z \mid x)\,\|\,p_{\theta}(z)\right)
+        + \mathbb{E}_{q_{\phi}(z \mid x)}[\log p_{\theta}(x \mid z)] .
+    \]
+    Using the reparameterization trick
+    \[
+        z = \mu_{\phi}(x) + \sigma_{\phi}(x)\odot \epsilon,
+        \qquad \epsilon \sim \mathcal{N}(0,I),
+    \]
+    the stochastic objective becomes differentiable and trainable by gradient descent.
+    \bibliographystyle{plainnat}
+    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
