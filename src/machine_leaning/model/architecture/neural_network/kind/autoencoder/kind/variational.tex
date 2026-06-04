@@ -31,19 +31,122 @@
 
 \begin{document}
     \maketitle
-    \cite{kingma-2013-auto-encoding-variational-bayes} introduced the variational autoencoder, where an encoder approximates the intractable posterior as \(q_{\phi}(z \mid x)\), while a decoder models data generation as \(p_{\theta}(x \mid z)\).
-    The model maximizes the variational lower bound
-    \[
-        \log p_{\theta}(x) \geq \mathcal{L}(\theta,\phi;x)
-        = -D_{\mathrm{KL}}\!\left(q_{\phi}(z \mid x)\,\|\,p_{\theta}(z)\right)
-        + \mathbb{E}_{q_{\phi}(z \mid x)}[\log p_{\theta}(x \mid z)] .
-    \]
-    Using the reparameterization trick
-    \[
-        z = \mu_{\phi}(x) + \sigma_{\phi}(x)\odot \epsilon,
-        \qquad \epsilon \sim \mathcal{N}(0,I),
-    \]
-    the stochastic objective becomes differentiable and trainable by gradient descent.
-    \bibliographystyle{plainnat}
-    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+    \cite{kingma-2013-auto-encoding-variational-bayes}
+    
+    
+    \section{Architecture}
+        A Variational Autoencoder, or VAE, is a generative neural network model that learns a compressed probabilistic representation of input data. Instead of mapping each input directly to one fixed latent vector, a VAE maps each input to a probability distribution in the latent space.
+        
+        Let the input data be
+        
+        \begin{equation}
+            \mathbf{x} \in \mathbb{R}^{d}
+        \end{equation}
+        
+        The encoder maps the input $\mathbf{x}$ to the parameters of a latent Gaussian distribution:
+        
+        \begin{equation}
+            q_{\phi}(\mathbf{z} \mid \mathbf{x})
+            =
+            \mathcal{N}
+            \left(
+                \mathbf{z};
+                \boldsymbol{\mu}_{\phi}(\mathbf{x}),
+                \operatorname{diag}
+                \left(
+                    \boldsymbol{\sigma}_{\phi}^{2}(\mathbf{x})
+                \right)
+            \right)
+        \end{equation}
+        
+        Here, $\mathbf{z}$ is the latent variable, $\boldsymbol{\mu}_{\phi}(\mathbf{x})$ is the learned mean vector, and $\boldsymbol{\sigma}_{\phi}(\mathbf{x})$ is the learned standard deviation vector. The encoder parameters are denoted by $\phi$.
+        
+        To sample a latent vector in a differentiable way, the VAE uses the reparameterization trick:
+        
+        \begin{equation}
+            \mathbf{z}
+            =
+            \boldsymbol{\mu}_{\phi}(\mathbf{x})
+            +
+            \boldsymbol{\sigma}_{\phi}(\mathbf{x})
+            \odot
+            \boldsymbol{\epsilon},
+            \qquad
+            \boldsymbol{\epsilon}
+            \sim
+            \mathcal{N}
+            \left(
+                \mathbf{0},
+                \mathbf{I}
+            \right)
+        \end{equation}
+        
+        The decoder then reconstructs the input from the latent variable:
+        
+        \begin{equation}
+            p_{\theta}(\mathbf{x} \mid \mathbf{z})
+        \end{equation}
+        
+        where $\theta$ denotes the decoder parameters. The reconstructed output can be written as
+        
+        \begin{equation}
+            \hat{\mathbf{x}}
+            =
+            f_{\theta}(\mathbf{z})
+        \end{equation}
+    
+    
+    \section{Training}
+        The VAE is trained by minimizing two terms. The first term is the reconstruction loss, which forces the decoder to reconstruct the original input:
+        
+        \begin{equation}
+            \mathcal{L}_{\mathrm{rec}}
+            =
+            \left\|
+                \mathbf{x}
+                -
+                \hat{\mathbf{x}}
+            \right\|^{2}
+        \end{equation}
+        
+        The second term is the Kullback--Leibler divergence, which forces the learned latent distribution to stay close to a standard normal distribution:
+        
+        \begin{equation}
+            \mathcal{L}_{\mathrm{KL}}
+            =
+            D_{\mathrm{KL}}
+            \left(
+                q_{\phi}(\mathbf{z} \mid \mathbf{x})
+                \parallel
+                p(\mathbf{z})
+            \right)
+        \end{equation}
+        
+        where the prior distribution is usually defined as
+        
+        \begin{equation}
+            p(\mathbf{z})
+            =
+            \mathcal{N}
+            \left(
+                \mathbf{0},
+                \mathbf{I}
+            \right)
+        \end{equation}
+        
+        The full VAE loss is therefore
+        
+        \begin{equation}
+            \mathcal{L}_{\mathrm{VAE}}
+            =
+            \mathcal{L}_{\mathrm{rec}}
+            +
+            \lambda_{\mathrm{KL}}
+            \mathcal{L}_{\mathrm{KL}}
+        \end{equation}
+        where $\lambda_{\mathrm{KL}}$ controls the strength of the KL regularization.
+        
+        In simple terms, the encoder learns how to compress the input into a probabilistic latent representation, and the decoder learns how to reconstruct the input from that latent representation. The reconstruction term preserves information from the input, while the KL term organizes the latent space and makes it possible to sample new latent vectors smoothly.
+        \bibliographystyle{plainnat}
+        \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
 \end{document}
