@@ -11,22 +11,52 @@
 \begin{document}
     \maketitle
     \begin{itemize}
+
         \item \textbf{Outlier:}
-        A data point that lies far from the majority of observations in feature space.
-        It is a purely statistical notion (distance, density, deviation).
-        An outlier is not necessarily an error; it may be rare but valid. (Such as noise)
-        
+
+        An outlier is an observation that deviates markedly from other members
+        of the sample or appears inconsistent with the remainder of the data
+        \cite{hodge-austin-2004-a-survey-of-outlier-detection-methodologies}.
+
+        Outlierness is primarily characterized through statistical properties
+        such as distance, density, probability, or deviation from the dominant
+        structure of the data.
+
+        An outlier does not necessarily represent an error or an invalid
+        observation; it may result from measurement error, system faults, noise,
+        or simply a rare but valid natural variation
+        \cite{hodge-austin-2004-a-survey-of-outlier-detection-methodologies}.
+
         \item \textbf{Anomaly:}
-        A behavior or state that violates the expected operating pattern of a system.
-        It has semantic or system-level meaning (fault, attack, malfunction).
-        An anomaly may appear as an outlier, but it can also be a structured pattern (e.g., temporal drift) rather than a single extreme point.
-        
+
+        An anomaly is an observation, behavior, or pattern that does not conform
+        to a well-defined notion of expected or normal behavior
+        \cite{chandola-banerjee-kumar-2009-anomaly-detection-a-survey}.
+
+        Depending on the application, an anomaly may correspond to a fault,
+        intrusion, fraud, malfunction, or another event that is relevant to the
+        system or analyst.
+
+        Anomalies are not restricted to isolated extreme points; they may be
+        point anomalies, contextual anomalies, or collective patterns whose
+        abnormality emerges from their context or their relationships with other
+        observations
+        \cite{chandola-banerjee-kumar-2009-anomaly-detection-a-survey}.
+
         \item \textbf{Novelty:}
-        A sample or regime coming from a distribution not seen during training.
-        Training data are assumed to contain only normal behavior.
-        Novelty is typically interpreted as distribution shift rather than local abnormality.
+
+        Novelty detection is the task of identifying test observations that
+        differ from the data available during training
+        \cite{pimentel-clifton-clifton-tarassenko-2014-a-review-of-novelty-detection}.
+
+        It is commonly formulated as a one-class classification problem in which a model of normality is constructed from training data that predominantly, or ideally exclusively, represent normal behavior.
+
+        A novel observation therefore represents a previously unseen pattern relative to the learned model of normality. Unlike an anomaly, a detected
+        novelty may subsequently be incorporated into the model of normal behavior if it is determined to represent a valid new regime \cite{pimentel-clifton-clifton-tarassenko-2014-a-review-of-novelty-detection,
+        chandola-banerjee-kumar-2009-anomaly-detection-a-survey}.
+
     \end{itemize}
-    
-    % \bibliographystyle{plain}
-    % \bibliography{/home/donkarlo/Dropbox/repo/shared_research/refs/refs}
+
+    \bibliographystyle{plain}
+    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
 \end{document}
