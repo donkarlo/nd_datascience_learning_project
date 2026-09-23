@@ -1,0 +1,48 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+   
+   \section{Definition}
+   Berberidis et al. propose a method for detecting weak periodicities in large time-series data when the period is not    known in advance \cite{berberidis-2002-on-the-discovery-of-weak-periodicities-in-large-time-series}. The method combines the autocorrelation function with the Fast Fourier Transform (FFT) to identify approximate periodic behavior. FFT provides an efficient frequency-domain representation that helps identify candidate periodic components. Autocorrelation is then used to characterize repeating patterns in the time series. The approach enables period discovery without requiring the period length to be specified beforehand.
+   
+   A fast Fourier transform (FFT) is an algorithm that computes the discrete Fourier transform (DFT), or its inverse (IDFT), of a sequence. A Fourier transform converts a signal from its original domain (often time or space) to a representation in the frequency domain and vice versa \seeherefooter{https://en.wikipedia.org/wiki/Fast_Fourier_transform}.
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
