@@ -31,157 +31,219 @@
 \date{}
 
 \begin{document}
-\maketitle
+   \maketitle
 
-\subsection{DBSCAN}
-    
-    Let the dataset be
-    
-    \[
-        X = \{x_1, x_2, \dots, x_n\},
-    \]
-    
-    where each object \(x_i\) belongs to a metric space with distance function
-    
-    \[
-        d : X \times X \rightarrow \mathbb{R}_{\geq 0}.
-    \]
-    
-    DBSCAN uses two parameters:
-    
-    \[
-        \varepsilon > 0
-    \]
-    
-    and
-    
-    \[
-        \mathrm{MinPts} \in \mathbb{N}.
-    \]
-    
-    The \(\varepsilon\)-neighborhood of a point \(x_i\) is defined as
-    
-    \[
-        N_{\varepsilon}(x_i)
-        =
-        \{x_j \in X \mid d(x_i, x_j) \leq \varepsilon\}.
-    \]
-    
-    A point \(x_i\) is called a core point if
-    
-    \[
-        |N_{\varepsilon}(x_i)| \geq \mathrm{MinPts}.
-    \]
-    
-    A point \(x_j\) is directly density-reachable from \(x_i\) if
-    
-    \[
-        x_j \in N_{\varepsilon}(x_i)
-    \]
-    
-    and
-    
-    \[
-        |N_{\varepsilon}(x_i)| \geq \mathrm{MinPts}.
-    \]
-    
-    A point \(x_j\) is density-reachable from \(x_i\) if there exists a sequence of points
-    
-    \[
-        x_i = p_1, p_2, \dots, p_m = x_j
-    \]
-    
-    such that
-    
-    \[
-        p_{k+1}
-    \]
-    
-    is directly density-reachable from
-    
-    \[
-        p_k
-    \]
-    
-    for every
-    
-    \[
-        k = 1, 2, \dots, m-1.
-    \]
-    
-    Two points \(x_i\) and \(x_j\) are density-connected if there exists a point \(o \in X\) such that both \(x_i\) and \(x_j\) are density-reachable from \(o\).
-    
-    A cluster \(C \subseteq X\) in DBSCAN satisfies two conditions.
-    
-    First, maximality:
-    
-    \[
-        x_i \in C
-        \land
-        x_j \text{ is density-reachable from } x_i
-        \Rightarrow
-        x_j \in C.
-    \]
-    
-    Second, density connectivity:
-    
-    \[
-        \forall x_i, x_j \in C,
-        \quad
-        x_i \text{ and } x_j \text{ are density-connected}.
-    \]
-    
-    All points that do not belong to any cluster are labeled as noise:
-    
-    \[
-        \mathrm{Noise}
-        =
-        X \setminus \bigcup_{k=1}^{K} C_k.
-    \]
-    
-    \begin{algorithm}
-        \caption{DBSCAN}
-        \begin{algorithmic}[1]
+   \section{Definition}
+
+      Ester et al.~\cite{ester-1996-a-density-based-algorithm-for-discovering-clusters-in-large-spatial-databases-with-noise} introduced DBSCAN as a density-based clustering method for spatial databases. The method identifies clusters as dense regions separated by regions of lower density. It can discover clusters of arbitrary shape without requiring the number of clusters in  advance. Points that do not satisfy the density-connectivity conditions are explicitly classified as noise.
+      \seeherefooter{https://en.wikipedia.org/wiki/DBSCAN}
+
+      \subsection{Input and Output}
+
+         \textbf{Input:}
+
+         \begin{itemize}
+            \item A dataset
+            \[
+            X = \{x_1, x_2, \ldots, x_n\}.
+            \]
+            \item A distance function
+            \[
+            d : X \times X \rightarrow \mathbb{R}_{\geq 0}.
+            \]
+            \item The neighborhood radius
+            \[
+            \varepsilon > 0.
+            \]
+            \item The minimum number of points required to form a dense region,
+            \[
+            \mathrm{MinPts} \in \mathbb{N}.
+            \]
+         \end{itemize}
+
+         \textbf{Output:}
+
+         \begin{itemize}
+            \item A set of clusters
+            \[
+            \{C_1, C_2, \ldots, C_K\},
+            \]
+            where the number of clusters $K$ is determined automatically by DBSCAN.
+            \item A set of noise points
+            \[
+            \mathrm{Noise}
+            =
+            X \setminus \bigcup_{k=1}^{K} C_k.
+            \]
+         \end{itemize}
+      \subsection{Advantages}
+
+         \begin{itemize}
+            \item DBSCAN does not require the number of clusters to be specified in advance.
+            \item It can discover clusters with arbitrary shapes.
+            \item It can explicitly identify noise and outlier points.
+            \item It is suitable for datasets in which clusters are separated by low-density regions.
+            \item It can use different distance functions depending on the structure of the data.
+         \end{itemize}
+
+      \subsection{Disadvantages}
+
+         \begin{itemize}
+            \item The clustering result can be sensitive to the choice of $\varepsilon$ and $\mathrm{MinPts}$.
+            \item A single global value of $\varepsilon$ may perform poorly when clusters have substantially different densities.
+            \item Its performance can degrade in high-dimensional spaces because distance measures become less informative.
+            \item Border points can sometimes be assigned differently depending on the order in which clusters are expanded.
+            \item Selecting appropriate parameter values can require prior knowledge or exploratory analysis of the dataset.
+         \end{itemize}
+   \section{Methodology}
+
+      Let the dataset be
+
+      \[
+      X = \{x_1, x_2, \dots, x_n\},
+      \]
+
+      where each object \(x_i\) belongs to a metric space with distance function
+
+      \[
+      d : X \times X \rightarrow \mathbb{R}_{\geq 0}.
+      \]
+
+      DBSCAN uses two parameters:
+
+      \[
+      \varepsilon > 0
+      \]
+
+      and
+
+      \[
+      \mathrm{MinPts} \in \mathbb{N}.
+      \]
+
+      The \(\varepsilon\)-neighborhood of a point \(x_i\) is defined as
+
+      \[
+      N_{\varepsilon}(x_i)
+      =
+      \{x_j \in X \mid d(x_i, x_j) \leq \varepsilon\}.
+      \]
+
+      A point \(x_i\) is called a core point if
+
+      \[
+      |N_{\varepsilon}(x_i)| \geq \mathrm{MinPts}.
+      \]
+
+      A point \(x_j\) is directly density-reachable from \(x_i\) if
+
+      \[
+      x_j \in N_{\varepsilon}(x_i)
+      \]
+
+      and
+
+      \[
+      |N_{\varepsilon}(x_i)| \geq \mathrm{MinPts}.
+      \]
+
+      A point \(x_j\) is density-reachable from \(x_i\) if there exists a sequence of points
+
+      \[
+      x_i = p_1, p_2, \dots, p_m = x_j
+      \]
+
+      such that
+
+      \[
+      p_{k+1}
+      \]
+
+      is directly density-reachable from
+
+      \[
+      p_k
+      \]
+
+      for every
+
+      \[
+      k = 1, 2, \dots, m-1.
+      \]
+
+      Two points \(x_i\) and \(x_j\) are density-connected if there exists a point \(o \in X\) such that both \(x_i\) and \(x_j\) are density-reachable from \(o\).
+
+      A cluster \(C \subseteq X\) in DBSCAN satisfies two conditions.
+
+      First, maximality:
+
+      \[
+      x_i \in C
+      \land
+      x_j \text{ is density-reachable from } x_i
+      \Rightarrow
+      x_j \in C.
+      \]
+
+      Second, density connectivity:
+
+      \[
+      \forall x_i, x_j \in C,
+      \quad
+      x_i \text{ and } x_j \text{ are density-connected}.
+      \]
+
+      All points that do not belong to any cluster are labeled as noise:
+
+      \[
+      \mathrm{Noise}
+      =
+      X \setminus \bigcup_{k=1}^{K} C_k.
+      \]
+
+      \begin{algorithm}
+         \caption{DBSCAN}
+         \begin{algorithmic}[1]
             \Require Dataset \(X\), distance function \(d\), radius \(\varepsilon\), minimum number of points \(\mathrm{MinPts}\)
             \Ensure Clusters \(C_1, C_2, \dots, C_K\) and noise points
-            
+
             \State Mark all points as unvisited
             \State \(K \gets 0\)
-            
+
             \ForAll{\(x_i \in X\)}
-                \If{\(x_i\) is visited}
-                    \State Continue
-                \EndIf
-                
-                \State Mark \(x_i\) as visited
-                \State \(N \gets N_{\varepsilon}(x_i)\)
-                
-                \If{\(|N| < \mathrm{MinPts}\)}
-                    \State Mark \(x_i\) as noise
-                \Else
-                    \State \(K \gets K + 1\)
-                    \State Create a new cluster \(C_K\)
-                    \State Add \(x_i\) to \(C_K\)
-                    
-                    \ForAll{\(x_j \in N\)}
-                        \If{\(x_j\) is not visited}
-                            \State Mark \(x_j\) as visited
-                            \State \(N_j \gets N_{\varepsilon}(x_j)\)
-                            
-                            \If{\(|N_j| \geq \mathrm{MinPts}\)}
-                                \State \(N \gets N \cup N_j\)
-                            \EndIf
-                        \EndIf
-                        
-                        \If{\(x_j\) is not assigned to any cluster}
-                            \State Add \(x_j\) to \(C_K\)
-                        \EndIf
-                    \EndFor
-                \EndIf
+            \If{\(x_i\) is visited}
+            \State Continue
+            \EndIf
+
+            \State Mark \(x_i\) as visited
+            \State \(N \gets N_{\varepsilon}(x_i)\)
+
+            \If{\(|N| < \mathrm{MinPts}\)}
+            \State Mark \(x_i\) as noise
+            \Else
+            \State \(K \gets K + 1\)
+            \State Create a new cluster \(C_K\)
+            \State Add \(x_i\) to \(C_K\)
+
+            \ForAll{\(x_j \in N\)}
+            \If{\(x_j\) is not visited}
+            \State Mark \(x_j\) as visited
+            \State \(N_j \gets N_{\varepsilon}(x_j)\)
+
+            \If{\(|N_j| \geq \mathrm{MinPts}\)}
+            \State \(N \gets N \cup N_j\)
+            \EndIf
+            \EndIf
+
+            \If{\(x_j\) is not assigned to any cluster}
+            \State Add \(x_j\) to \(C_K\)
+            \EndIf
             \EndFor
-        \end{algorithmic}
-    \end{algorithm}
-    \nocite{*}
-    \bibliographystyle{plainnat}
-    \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+            \EndIf
+            \EndFor
+         \end{algorithmic}
+      \end{algorithm}
+      \nocite{*}
+      \bibliographystyle{plainnat}
+      \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
 \end{document}
