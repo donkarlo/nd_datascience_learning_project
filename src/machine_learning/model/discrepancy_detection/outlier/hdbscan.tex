@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{HDBSCAN}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+
+\section{Clustering rule}
+HDBSCAN builds a cluster hierarchy using mutual reachability distance. If \(c_k(x)\) is the core distance at \(x\), this distance is
+\[
+d_{\mathrm{mr}}(x,y)=\max\{c_k(x),c_k(y),d(x,y)\}.
+\]
+The hierarchy is condensed using a minimum cluster size. Stable groups can be selected across density levels, and unassigned points receive a noise label. Implementations may also provide a graded outlier score such as GLOSH.
+
+\section{Example}
+A dataset can contain a tight group of frequent customers and a looser group of occasional customers. Both can persist at different density levels, while isolated customers may be left unassigned.
+
+\section{Practical considerations}
+Tune the minimum cluster size and the neighborhood size used for core distances. Compare cluster stability and inspect how flags change with scaling and the distance metric. A valid group smaller than the minimum cluster size can be labeled noise.
+
+
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

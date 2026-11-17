@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{Mahalanobis Distance}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+
+\section{Scoring rule}
+For a feature vector \(x\), reference mean \(\mu\), and invertible reference covariance matrix \(\Sigma\), the squared distance is
+\[
+D^2(x)=(x-\mu)^\top\Sigma^{-1}(x-\mu).
+\]
+Covariance accounts for feature scale and correlation. Departures along directions with low reference variance receive more weight.
+
+\section{Example}
+Suppose standardized revenue and order count have correlation \(0.9\). The point \((1,-1)\) has \(D^2=20\), while \((1,1)\) has \(D^2\approx 1.05\). Each point has the same Euclidean distance from the mean.
+
+\section{Practical considerations}
+Under a multivariate Gaussian model with known parameters, \(D^2\) follows a chi-square distribution with degrees of freedom equal to the feature count. With estimated parameters, check calibration on held-out reference data. Regularization helps with poorly conditioned covariance, and robust covariance estimation helps when the reference sample contains outliers.
+
+
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

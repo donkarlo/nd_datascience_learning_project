@@ -1,0 +1,85 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{STL Trend and Seasonal Decomposition}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+STL means \emph{Seasonal and Trend decomposition using LOESS}. It decomposes regularly observed data into a time-varying trend, recurring seasonal effects, and a remainder.
+
+\section{Additive Model}
+\[
+ y_t=T_t+S_t+R_t.
+\]
+Here $T_t$ is a smooth trend, $S_t$ is the seasonal signal, and $R_t$ captures what the first two components do not explain. Additive STL is less natural for series whose seasonal amplitude is proportional to their level; a transformation such as logarithms may be useful for strictly positive observations.
+
+\section{Methodology}
+Given observations with a consistent frequency and a seasonal period $p$:
+\begin{enumerate}
+ \item Smooth groups of observations at corresponding seasonal positions.
+ \item Construct an estimate of the seasonal component.
+ \item Remove seasonality and locally smooth the deseasonalized data to estimate trend.
+ \item Iterate estimates of the seasonal and trend components.
+ \item Optionally downweight outliers with robust iterations.
+ \item Compute residuals $R_t=y_t-T_t-S_t$.
+\end{enumerate}
+LOESS smoothing is a central ingredient of the decomposition.
+
+\section{E-Commerce Example}
+Daily e-commerce orders commonly differ between weekdays and weekends. With seasonal period $p=7$, STL can help isolate an underlying growth pattern from these weekly changes.
+
+\section{Python Illustration}
+\begin{verbatim}
+from statsmodels.tsa.seasonal import STL
+
+# daily_sales: a regular daily Series, with missing
+# calendar dates and missing values handled explicitly.
+fit = STL(daily_sales, period=7, robust=True).fit()
+trend = fit.trend
+seasonality = fit.seasonal
+remainder = fit.resid
+\end{verbatim}
+
+\section{Advantages}
+\begin{itemize}
+ \item Separates long-run changes from a recurring seasonal pattern.
+ \item Supports nonlinear smooth trends.
+ \item Offers robust fitting to limit certain outlier effects.
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+ \item Requires appropriate frequency and seasonal-period selection.
+ \item Standard STL uses one seasonal period; use a multiple-seasonality approach for weekly plus annual patterns.
+ \item Trend estimates depend on smoothing settings and may be unstable near endpoints.
+ \item Retrospective two-sided smoothing may use future observations and leak information in predictive modeling.
+\end{itemize}
+
+\section{Practical Guidance}
+Inspect all three components. Account for promotions, holidays, stockouts, and known structural changes. During chronological forecasting evaluation, fit preprocessing only to the available training history.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

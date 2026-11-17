@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{Modified Z-Score}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+
+\section{Scoring rule}
+Let \(m=\operatorname{median}_i x_i\) and let \(\mathrm{MAD}=\operatorname{median}_i |x_i-m|\) be the unscaled median absolute deviation. The score is
+\[
+z_i^* = 0.67449\frac{x_i-m}{\mathrm{MAD}}.
+\]
+A common heuristic flags \(|z_i^*|>3.5\). The constant makes the scale comparable to a standard z-score for normally distributed data.
+
+\section{Example}
+For a reference median of \(20\) and a MAD of \(2\), a value of \(32\) has \(z^*\approx 4.05\) and is flagged.
+
+\section{Practical considerations}
+Median-based estimates resist a small fraction of extreme values. If the MAD is zero, the score is undefined. Check for ties or quantization and use a meaningful tolerance or another scale estimate. For skewed data, calibrate the two tails separately if necessary.
+
+
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

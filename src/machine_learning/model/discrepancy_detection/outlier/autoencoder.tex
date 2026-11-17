@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{Autoencoder Reconstruction Error}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+
+\section{Scoring rule}
+An autoencoder learns an encoder \(f_\theta\) and a decoder \(g_\phi\) on representative reference data. With \(p\) numeric features and reconstruction \(\hat x=g_\phi(f_\theta(x))\), one possible score is
+\[
+s(x)=\frac{1}{p}\sum_{j=1}^{p}(x_j-\hat x_j)^2.
+\]
+Large errors indicate that the learned representation reconstructs an observation poorly.
+
+\section{Example}
+Train on standardized feature vectors from routine machine operation. If a new vector combines an ordinary temperature with a vibration pattern rarely seen at that temperature, the reconstruction may fit the routine pattern and leave a large vibration residual.
+
+\section{Practical considerations}
+Fit preprocessing on training data and calibrate the threshold on held-out data. For example, a high validation quantile estimates a reference false-alarm rate if deployment data remain comparable. Excess model capacity or contaminated training data can let the model reconstruct unusual inputs well. Inspect per-feature errors when investigating flagged points.
+
+
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

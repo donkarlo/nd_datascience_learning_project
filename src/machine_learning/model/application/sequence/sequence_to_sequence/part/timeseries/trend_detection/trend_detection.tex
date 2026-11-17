@@ -1,0 +1,69 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Trend Detection in Time Series}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+Trend detection identifies persistent changes in the underlying level of a time series. It differs from forecasting: trend analysis describes the past; forecasting predicts future values.
+
+An exploratory additive decomposition is
+\[
+ y_t = T_t + S_t + R_t,
+\]
+where $T_t$ denotes trend, $S_t$ denotes seasonality, and $R_t$ is the remainder. An additive decomposition is not always appropriate: positive retail data may instead exhibit multiplicative seasonality.
+
+\section{Common Methods}
+\begin{itemize}
+ \item Moving Average: interpretable smoothing of short-run fluctuations.
+ \item Exponential Moving Average: online smoothing emphasizing recent data.
+ \item Linear Regression: interpretable linear trend and slope.
+ \item Mann--Kendall Test: rank-based significance test for monotonic trend.
+ \item Theil--Sen Estimator: robust estimate of linear trend slope.
+ \item STL Decomposition: separate seasonal, trend, and remainder components.
+ \item Change-Point Detection: discover structural breaks in level or slope.
+ \item LOESS/LOWESS: flexible local estimation of nonlinear trends.
+\end{itemize}
+Each method has a standalone LaTeX document in its own subfolder.
+
+\section{E-Commerce Analysis Workflow}
+\begin{enumerate}
+ \item Define a daily or weekly measure: revenue, units sold, or conversion rate.
+ \item Normalize timestamps and distinguish missing values from real zeros.
+ \item Plot raw data; annotate holidays, promotions, and stockouts.
+ \item Use a moving average or EMA for initial exploratory smoothing.
+ \item Account for day-of-week and seasonal variation using STL if appropriate.
+ \item Quantify a roughly linear trend with regression or Theil--Sen.
+ \item Test for monotonic trend using Mann--Kendall only after checking dependence.
+ \item Investigate regime changes before reporting a single global trend.
+ \item For forecasting, fit every transformation using only the training history.
+\end{enumerate}
+
+\section{Important Distinctions}
+Smoothing does not establish statistical significance. A Mann--Kendall test checks for evidence of a monotonic direction, whereas Theil--Sen estimates its magnitude. A change-point method identifies structural transitions rather than one continuous slope. Two-sided smoothers may use future observations and cause data leakage if used as prediction-time features.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

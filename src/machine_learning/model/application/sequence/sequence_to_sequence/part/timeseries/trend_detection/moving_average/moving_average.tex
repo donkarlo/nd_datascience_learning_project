@@ -1,0 +1,82 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Moving Average for Trend Detection}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+A moving average (MA) smooths a sequence by replacing each observation with the average of observations in a window. It reveals slowly changing patterns but does not formally test the presence of a trend.
+
+\section{Formula and Methodology}
+For a regularly sampled sequence $y_t$ and an integer window size $k$, the trailing simple moving average is
+\[
+ m_t = \frac{1}{k}\sum_{i=0}^{k-1} y_{t-i},\qquad t\ge k.
+\]
+A trailing window uses only current and past observations. A centered window is useful for retrospective plots but uses future observations; it must not be confused with a real-time feature.
+
+\section{Example: Online Orders}
+Suppose seven consecutive daily order counts are
+\[
+ 82,\ 94,\ 91,\ 105,\ 107,\ 99,\ 122.
+\]
+Their trailing seven-day average is
+\[
+ m_7 = \frac{82+94+91+105+107+99+122}{7}=100.
+\]
+Thus the seven-day local level is 100 orders/day, not necessarily the prediction for tomorrow.
+
+\section{SQL Example}
+For a table with exactly one row per calendar day:
+\begin{verbatim}
+SELECT day, orders,
+       AVG(orders) OVER (
+         ORDER BY day
+         ROWS BETWEEN 6 PRECEDING AND CURRENT ROW
+       ) AS ma_7
+FROM daily_sales
+ORDER BY day;
+\end{verbatim}
+This uses seven \emph{rows}; missing dates must be treated explicitly. For the first six dates, SQL returns a shorter partial average unless incomplete windows are filtered out.
+
+\section{Advantages}
+\begin{itemize}
+ \item Transparent, fast, and easy to compute.
+ \item Reduces short-term fluctuations.
+ \item Useful as a dashboard baseline.
+\end{itemize}
+\section{Limitations}
+\begin{itemize}
+ \item Lags real changes, especially with large windows.
+ \item Can conceal local spikes and turning points.
+ \item Sensitive to outliers and the choice of $k$.
+ \item Does not provide statistical significance or uncertainty by itself.
+\end{itemize}
+
+\section{Practical Guidance}
+Compare window lengths appropriate to the sampling frequency (e.g., seven and twenty-eight days for daily retail data). Always show the raw series alongside the smoothed estimate.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

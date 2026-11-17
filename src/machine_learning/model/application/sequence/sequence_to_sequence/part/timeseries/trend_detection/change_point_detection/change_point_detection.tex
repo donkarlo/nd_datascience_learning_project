@@ -1,0 +1,83 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Change-Point Detection}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+Change-point detection seeks times where the distribution or structure of a time series changes. A structural break can mean a different mean, variance, trend slope, or other model parameters. A one-day anomaly is not necessarily a change point.
+
+\section{Segmentation Objective}
+For boundaries $0=\tau_0<\tau_1<\cdots<\tau_K<\tau_{K+1}=n$, a widely used penalized objective is
+\[
+ \underset{K,\tau_1,\ldots,\tau_K}{\operatorname{minimize}}
+ \left\{\sum_{k=0}^{K}
+ C\bigl(y_{\tau_k+1:\tau_{k+1}}\bigr)
+ +\lambda K\right\}.
+\]
+Here $C$ is a segment cost, such as squared errors around a segment mean; $\lambda$ penalizes adding too many breakpoints. To detect slope changes rather than level shifts, choose a cost based on fitted trends.
+
+\section{Representative Algorithms}
+\begin{itemize}
+ \item \textbf{CUSUM:} cumulative-sum monitoring for persistent shifts, often used sequentially.
+ \item \textbf{Binary segmentation:} recursively splits the sequence at candidate change points; efficient but approximate.
+ \item \textbf{PELT:} exact penalized segmentation by dynamic programming with pruning under suitable assumptions on the cost. Linear expected time can occur in favorable conditions, but runtime is not universally linear.
+\end{itemize}
+
+\section{E-Commerce Example}
+A redesign of a shopping-cart page may lead to a lasting conversion-rate shift. A detected breakpoint can prompt investigation of that release. A short holiday sales surge, by contrast, may reflect seasonality rather than a permanent regime change.
+
+\section{Python Illustration}
+\begin{verbatim}
+import ruptures as rpt
+
+# signal: one-dimensional ordered observations.
+model = rpt.Pelt(model="l2", min_size=7).fit(signal)
+end_indices = model.predict(pen=10)
+# Typically the final end index is included as a
+# boundary marker, not a discovered change point.
+\end{verbatim}
+
+\section{Advantages}
+\begin{itemize}
+ \item Detects changes missed by a single global regression slope.
+ \item Supports operational investigations and monitoring.
+ \item Different costs target different change types.
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+ \item Sensitive to penalty, minimum segment length, and the cost model.
+ \item Seasonality and autocorrelation may generate false breaks.
+ \item A detected breakpoint does not prove what caused the change.
+ \item Offline segmentation can use future observations unavailable to live detectors.
+\end{itemize}
+
+\section{Practical Guidance}
+Account for weekly effects, promotions, and outages before fitting. Compare detected dates with known business interventions and test sensitivity to penalty choices.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

@@ -1,0 +1,87 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Theil--Sen Trend Slope Estimator}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+The Theil--Sen estimator is a robust approach to estimating the slope of a roughly linear trend. It uses the median of all valid slopes between pairs of data points rather than minimizing squared errors.
+
+\section{Methodology}
+For time points $t_i\ne t_j$, calculate the pairwise slopes
+\[
+ b_{ij}=\frac{y_j-y_i}{t_j-t_i},\qquad i<j,
+\]
+and take their median:
+\[
+ \widehat\beta_1^{\mathrm{TS}}
+ =\operatorname{median}_{i<j} b_{ij}.
+\]
+One reasonable intercept convention is
+\[
+ \widehat\beta_0^{\mathrm{TS}}=
+ \operatorname{median}_i(y_i-\widehat\beta_1^{\mathrm{TS}}t_i).
+\]
+Different libraries can use different intercept conventions. With irregular sampling, use actual elapsed time rather than observation numbers.
+
+\section{Algorithm}
+\begin{algorithm}[H]
+\caption{Pairwise Theil--Sen slope estimation}
+\begin{algorithmic}[1]
+ \State $B \gets \varnothing$
+ \For{$i=1,\ldots,n-1$}
+  \For{$j=i+1,\ldots,n$}
+   \If{$t_j\ne t_i$}
+    \State Add $(y_j-y_i)/(t_j-t_i)$ to $B$
+   \EndIf
+  \EndFor
+ \EndFor
+ \State \Return $\operatorname{median}(B)$
+\end{algorithmic}
+\end{algorithm}
+
+\section{E-Commerce Example}
+A marketing campaign may create a single unusually high revenue day. Such a point can strongly influence a least-squares slope. The median pairwise slope is less affected by a small number of outliers and can provide a more stable description of underlying sales growth.
+
+\section{Advantages}
+\begin{itemize}
+ \item More resistant to isolated outliers than ordinary least squares.
+ \item Direct interpretation in revenue per day or orders per week.
+ \item Does not require Gaussian errors to define a point estimate.
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+ \item A naive implementation computes $O(n^2)$ slopes and may use $O(n^2)$ memory.
+ \item A single global slope misses reversals and structural breaks.
+ \item Strong seasonality and time-series dependence still require care in interpretation and uncertainty estimates.
+\end{itemize}
+
+\section{Practical Guidance}
+Use this estimator for magnitude of a trend and a suitable statistical test for evidence of its presence. Compare results with a seasonally adjusted linear model when sales show a strong weekly pattern.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

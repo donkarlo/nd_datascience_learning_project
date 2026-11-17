@@ -1,0 +1,76 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Linear Regression for Trend Detection}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+Linear regression models a series as a linear function of elapsed time. The slope estimates the average change in a quantity per unit of time.
+
+\section{Model}
+For observations $(t,y_t)$, use
+\[
+ y_t=\beta_0+\beta_1 t+\varepsilon_t.
+\]
+The ordinary least-squares (OLS) estimate of the slope is
+\[
+ \widehat\beta_1 =
+ \frac{\sum_t(t-\overline t)(y_t-\overline y)}
+      {\sum_t(t-\overline t)^2}.
+\]
+A positive estimated slope indicates fitted growth, a negative slope indicates fitted decline. The slope sign alone does \emph{not} establish a statistically significant effect.
+
+\section{Example: E-Commerce Revenue}
+A fitted slope of 45 euros/day corresponds to an average model-based increase of 45 euros of revenue for each extra day. It is not proof that the passage of time caused the increase.
+
+\section{Accounting for Other Drivers}
+A retail trend model may require day-of-week indicators $D_{j,t}$ and a promotion indicator $P_t$:
+\[
+ y_t=\beta_0+\beta_1t+\sum_{j=1}^{6}\gamma_jD_{j,t}
+       +\delta P_t+\varepsilon_t.
+\]
+Interpret $\beta_1$ conditional on these covariates. Other potentially important factors include product mix, price changes, stockouts, and holidays.
+
+\section{Statistical Inference}
+A conventional hypothesis is $H_0:\beta_1=0$. Standard OLS tests require an appropriate error structure. Serial correlation or changing residual variance can invalidate naive standard errors. When needed, use valid time-series error modeling or robust standard errors.
+
+\section{Advantages}
+\begin{itemize}
+ \item Interpretable slope with practical units.
+ \item Simple baseline, easily extended with explanatory variables.
+ \item Confidence intervals possible under appropriate assumptions.
+\end{itemize}
+\section{Limitations}
+\begin{itemize}
+ \item One global slope can hide nonlinear changes and breakpoints.
+ \item OLS is sensitive to outliers.
+ \item Forecast extrapolation beyond the observed period can be unreliable.
+\end{itemize}
+\section{Practical Guidance}
+Inspect residual autocorrelation and the scatterplot. Compare with Theil--Sen for robustness and use LOESS or segmented models if the trend changes shape.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

@@ -1,0 +1,80 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Mann--Kendall Trend Test}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+The Mann--Kendall test is a nonparametric test for evidence of a monotonic increasing or decreasing trend in an ordered sequence. It uses the signs of pairwise differences rather than requiring a linear relationship.
+
+\section{Methodology}
+For observations $y_1,\ldots,y_n$, define
+\[
+ S=\sum_{i=1}^{n-1}\sum_{j=i+1}^{n}
+ \operatorname{sgn}(y_j-y_i)
+\]
+where $\operatorname{sgn}(u)$ is $1$ if $u>0$, $-1$ if $u<0$, and $0$ otherwise. Positive $S$ indicates more upward comparisons than downward comparisons.
+
+With no tied values, under the no-trend null,
+\[
+ \operatorname{Var}(S)=\frac{n(n-1)(2n+5)}{18}.
+\]
+If the data contain tied groups with respective sizes $q_r$, use the tie correction
+\[
+ \operatorname{Var}(S)=\frac{n(n-1)(2n+5)
+ -\sum_rq_r(q_r-1)(2q_r+5)}{18}.
+\]
+For a sufficiently large sample with positive variance, the continuity-corrected standardized score is
+\[
+ Z=\begin{cases}
+ \dfrac{S-1}{\sqrt{\operatorname{Var}(S)}}, & S>0,\\
+ 0, & S=0,\\
+ \dfrac{S+1}{\sqrt{\operatorname{Var}(S)}}, & S<0.
+ \end{cases}
+\]
+A two-sided test evaluates evidence for a monotonic trend. A test statistic or $p$-value alone does not report the size of a trend.
+
+\section{E-Commerce Example}
+Apply the test to monthly sales \emph{after addressing strong seasonal patterns}. If evidence favors an upward monotonic trend, report its practical magnitude separately using a slope estimate such as Theil--Sen.
+
+\section{Advantages}
+\begin{itemize}
+ \item Does not require normally distributed data.
+ \item Less influenced by the magnitude of extreme values than OLS.
+ \item Can detect monotonic but nonlinear changes.
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+ \item Serial correlation affects the null distribution; positive correlation can lead to false positives with naive inference.
+ \item Strong seasonal cycles can obscure or mimic overall direction.
+ \item Detects evidence of trend, not its slope or causal mechanism.
+\end{itemize}
+\section{Practical Guidance}
+Check autocorrelation and seasonality before selecting the test. Consider seasonal Mann--Kendall or suitably adjusted inference for dependent observations. Report the period analyzed, $p$-value, and an interpretable estimated slope together.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

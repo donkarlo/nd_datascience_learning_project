@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{Local Outlier Factor}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+
+\section{Scoring rule}
+Local Outlier Factor (LOF) measures whether a point is in a sparser region than its neighbors. For a point \(p\) and one of its neighbors \(o\), reachability distance is
+\[
+\operatorname{reach}_k(p,o)=\max\{d_k(o),d(p,o)\},
+\]
+where \(d_k(o)\) is the distance from \(o\) to its \(k\)-th neighbor. Local reachability density is the inverse of the mean reachability distance from \(p\) to its neighbors. LOF averages the ratios of neighbor density to point density. A score near \(1\) indicates similar density, and a score well above \(1\) indicates lower density at \(p\).
+
+\section{Example}
+A point on the outskirts of a dense customer segment may have a high score even if another segment is sparser overall. Its comparison is with nearby customers.
+
+\section{Practical considerations}
+Scale features for the distance metric and select \(k\) according to the size of relevant neighborhoods. In high dimensions, distances may lose contrast. For scoring new data, use an implementation that supports novelty detection with a fitted reference set.
+
+
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

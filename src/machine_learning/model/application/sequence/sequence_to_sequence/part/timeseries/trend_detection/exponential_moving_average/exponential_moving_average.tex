@@ -1,0 +1,81 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{Exponential Moving Average (EMA)}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+An exponential moving average (EMA), also called exponentially weighted moving average (EWMA), is an online smoother that weights recent values more strongly than older ones.
+
+\section{Methodology}
+For a parameter $0<\alpha\leq1$, compute
+\[
+ m_t=\alpha y_t+(1-\alpha)m_{t-1}.
+\]
+A typical initialization is $m_1=y_1$. Historical weights decay geometrically, so the previous observations never receive a sharp cutoff as in a fixed-window moving average.
+
+One conventional parameterization uses a nominal span $s$:
+\[
+ \alpha=\frac{2}{s+1}.
+\]
+The span is a smoothing convention; it is not a hard window size.
+
+\section{Example: Online Orders}
+If yesterday's EMA was 100 orders, today's sales are 130 orders, and $\alpha=0.2$, then
+\[
+ m_t=0.2(130)+0.8(100)=106.
+\]
+The smooth estimate reacts to the rise but avoids following its full magnitude.
+
+\section{Algorithm}
+\begin{algorithm}[H]
+\caption{Causal EMA update}
+\begin{algorithmic}[1]
+ \State $m_1\gets y_1$
+ \For{$t=2,\ldots,n$}
+    \State $m_t\gets \alpha y_t+(1-\alpha)m_{t-1}$
+ \EndFor
+ \State \Return $m_1,\ldots,m_n$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Advantages}
+\begin{itemize}
+ \item Constant memory and $O(1)$ work per new observation.
+ \item Reacts faster than a very long simple moving average.
+ \item Appropriate for streaming dashboards.
+\end{itemize}
+\section{Limitations}
+\begin{itemize}
+ \item Sensitive to the value of $\alpha$ and abrupt outliers.
+ \item Does not explicitly model calendar seasonality.
+ \item Does not quantify trend significance.
+\end{itemize}
+\section{Practical Guidance}
+A larger $\alpha$ gives a more responsive, less smooth curve. Distinguish basic EMA smoothing from Holt and Holt--Winters forecasting methods, which explicitly model level, trend, and possibly seasonality.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

@@ -1,0 +1,58 @@
+\documentclass[a4paper]{article}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usepackage{adjustbox}
+
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+
+% for external graphviz
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+
+% for tags
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+
+% for links
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+% for nested lists and sections
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/deep_structure.tex}
+
+\title{Prediction Residuals for Outlier Detection}
+\date{}
+\author{Mohammad Rahmani}
+
+\begin{document}
+   \maketitle
+
+\section{Scoring rule}
+Use a model to estimate the expected value from context. For a time series, form a one-step-ahead prediction \(\hat y_{t\mid t-1}\) using data available before time \(t\). The residual is
+\[
+e_t=y_t-\hat y_{t\mid t-1}.
+\]
+If predictive uncertainty varies, score \(|e_t|/\hat\sigma_t\) with \(\hat\sigma_t>0\), or flag observations outside a calibrated prediction interval.
+
+\section{Example}
+A service normally expects \(100\) requests per minute at a particular hour, with a predictive standard deviation of \(10\). A count of \(140\) gives a standardized residual of \(4\). The same count could be ordinary during a busier hour.
+
+\section{Practical considerations}
+Use chronological validation to prevent leakage and account for seasonality and changing variance. Persistent large residuals can indicate a regime change or a poor model. In a Kalman filter, the measurement minus its prior prediction is the innovation and can be scaled by its predicted covariance.
+
+
+
+   \bibliographystyle{plainnat}
+   \bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}

@@ -1,0 +1,88 @@
+\documentclass[a4paper]{article}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{minted}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{todonotes}
+\usepackage{forest}
+\usepackage{xstring}
+\usepackage{xcolor}
+\usepackage[most]{tcolorbox}
+\usepackage{xparse}
+\usepackage{natbib}
+\usetikzlibrary{graphs,graphdrawing}
+\usegdlibrary{layered}
+% ND Mind Mirror default input files.
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/external_graphviz.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/part/control_sequence/kind/semtag/semtag.tex}
+\input{/home/donkarlo/Dropbox/repo/nd_language_ai_project/src/nd_language_ai/formal/computer/programming/tex/latex/code_clips/seehere.tex}
+
+\title{LOESS and LOWESS Trend Smoothing}
+\date{}
+\author{Mohammad Rahmani}
+\begin{document}
+\maketitle
+
+\section{Definition}
+LOWESS (locally weighted scatterplot smoothing) and LOESS (locally estimated scatterplot smoothing) fit simple polynomial models in a neighborhood of each target point. The terminology overlaps, while LOESS often covers a broader choice of local polynomial degrees.
+
+\section{Methodology}
+At target time $t_0$, use a fraction of the nearby observations with distance-based weights. A common tricube weight is
+\[
+ w_i(t_0)=
+ \begin{cases}
+ \left(1-\left|\frac{t_i-t_0}{h}\right|^3\right)^3,
+       &|t_i-t_0|<h,\\
+ 0,&\text{otherwise},
+ \end{cases}
+\]
+where $h$ describes the neighborhood radius.
+
+Fit a local linear model by weighted least squares:
+\[
+ (\widehat a,\widehat b)=\underset{a,b}{\arg\min}\,
+ \sum_i w_i(t_0)\bigl[y_i-a-b(t_i-t_0)\bigr]^2.
+\]
+The local smoothed value is $\widehat T(t_0)=\widehat a$. One can instead fit a local quadratic polynomial. Some implementations also add residual-based robustness iterations.
+
+\section{E-Commerce Example}
+Demand for a new product might grow quickly after its launch and gradually flatten. A straight line would miss the changing growth rate, whereas a suitably tuned LOESS smoother can display the bend.
+
+\section{Python Illustration}
+\begin{verbatim}
+from statsmodels.nonparametric.smoothers_lowess import lowess
+
+trend = lowess(
+    endog=revenue,
+    exog=day_number,
+    frac=0.20,
+    it=2,
+    return_sorted=False,
+)
+\end{verbatim}
+The fraction controls the neighborhood size: larger values give smoother curves, but can blur short-term turning points.
+
+\section{Advantages}
+\begin{itemize}
+ \item Reveals nonlinear smooth relationships without selecting a global function.
+ \item Flexible for exploratory trend visualization.
+ \item Supports local rather than one-size-fits-all fitting.
+\end{itemize}
+
+\section{Limitations}
+\begin{itemize}
+ \item Sensitive to span/fraction and polynomial degree.
+ \item Endpoints are less stable and standard fits may use future observations.
+ \item Does not explicitly isolate seasonality or establish trend significance.
+ \item Repeated local fits may be expensive for very large datasets.
+\end{itemize}
+
+\section{Practical Guidance}
+Plot the raw values along with the fitted curve and check sensitivity to multiple spans. Remove or model strong seasonal effects first. For prediction-time use, avoid future data by using historical-only fitting or explicitly one-sided neighborhoods.
+
+\bibliographystyle{plainnat}
+\bibliography{/home/donkarlo/Dropbox/repo/nd_shared_research/bibliography/bibliography.bib}
+\end{document}
